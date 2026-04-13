@@ -308,64 +308,6 @@
   td { padding: 10px 14px; border-bottom: 1px solid var(--border-light); color: var(--text-2); }
   tr:last-child td { border-bottom: none; }
 
-  /* Template */
-  .tpl {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 16px;
-    font-family: var(--mono);
-    font-size: 13px;
-    line-height: 1.9;
-    color: var(--text-2);
-    white-space: pre-line;
-    position: relative;
-  }
-
-  .tpl .tl { position: absolute; top: -9px; left: 16px; font-family: var(--font); font-size: 12px; font-weight: 600; color: var(--text); background: var(--bg); border: 1px solid var(--border); padding: 1px 12px; border-radius: 4px; }
-
-  .cbtn {
-    position: absolute; top: 10px; right: 10px;
-    font-size: 12px; padding: 4px 12px;
-    background: var(--bg); color: var(--text-muted);
-    border: 1px solid var(--border); border-radius: 5px;
-    cursor: pointer; font-family: var(--font); transition: all 0.15s;
-  }
-  .cbtn:hover { color: var(--accent); border-color: var(--accent); }
-
-  /* Checklist */
-  .checklist { list-style: none; }
-
-  .checklist li {
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--border-light);
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: background 0.1s;
-  }
-
-  .checklist li:hover { background: var(--surface); }
-
-  .checklist li .ck {
-    width: 18px; height: 18px;
-    border: 2px solid var(--border);
-    border-radius: 4px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    transition: all 0.15s;
-  }
-
-  .checklist li.done .ck { background: var(--green); border-color: var(--green); color: #fff; }
-  .checklist li.done > span:last-child { text-decoration: line-through; color: var(--text-muted); }
-
   .rule {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -410,7 +352,6 @@
     <button class="tab active" onclick="switchTab(0)">Phân Loại Lỗi</button>
     <button class="tab" onclick="switchTab(1)">Quy Trình Xử Lý</button>
     <button class="tab" onclick="switchTab(2)">Vai Trò & Phân Công</button>
-    <button class="tab" onclick="switchTab(3)">Template & Checklist</button>
   </div>
 
   <!-- ====== TAB 0 ====== -->
@@ -435,7 +376,7 @@
         </ul>
         <div class="action-box">
           <span class="icon">⚡</span>
-          <span><strong>Người xử lý: Thắng (Dev Leader)</strong> — CS gọi điện trực tiếp cho Thắng ngay lập tức. Không chờ message. Thắng sẽ tự kéo Tech Leader vào hỗ trợ nếu cần.</span>
+          <span><strong>Người xử lý: Thắng (Dev Leader)</strong> — Operation gọi điện trực tiếp cho Thắng ngay lập tức. Không chờ message. Thắng sẽ tự kéo Tech Leader vào hỗ trợ nếu cần.</span>
         </div>
       </div>
 
@@ -453,7 +394,7 @@
         </ul>
         <div class="action-box">
           <span class="icon">💬</span>
-          <span><strong>Người xử lý: Thắng (Dev Leader)</strong> — CS message group kèm mô tả + ảnh/video. Thắng đánh giá → hướng dẫn workaround hoặc fix tạm. Fix chính thức Thứ 2. Thắng sẽ tự kéo Tech Leader vào nếu cần hỗ trợ.</span>
+          <span><strong>Người xử lý: Thắng (Dev Leader)</strong> — Operation message group kèm mô tả + ảnh/video. Thắng đánh giá → hướng dẫn workaround hoặc fix tạm. Fix chính thức Thứ 2. Thắng sẽ tự kéo Tech Leader vào nếu cần hỗ trợ.</span>
         </div>
       </div>
 
@@ -480,7 +421,7 @@
     <div class="section">
       <div class="section-head">
         <h2>3 câu hỏi phân loại nhanh</h2>
-        <p>CS trực dùng bộ câu hỏi này để xác định mức ưu tiên</p>
+        <p>Thắng dùng bộ câu hỏi này để xác định mức ưu tiên khi nhận báo lỗi</p>
       </div>
       <div class="decision">
         <span class="num">❶</span>
@@ -495,7 +436,7 @@
         <span>Còn lại → Dù có workaround hay không = <span class="result r2">P2</span> — tạo ticket, Thứ 2 xử lý</span>
       </div>
       <div class="hint">
-        💡 Nếu CS <strong>không chắc</strong> → mặc định <strong>P1</strong> và message Thắng. An toàn hơn là bỏ sót.
+        💡 Operation chỉ cần nhớ: cửa hàng <strong>không hoạt động được</strong> → gọi điện Thắng. Còn lại → message group. Thắng tự đánh giá.
       </div>
     </div>
   </div>
@@ -511,13 +452,14 @@
         <div class="flow-node">
           <span class="tag">B1</span>
           <h4>Nhận báo lỗi</h4>
-          <p>Nhân viên cửa hàng / CS báo qua group Zalo/Slack.<br>Yêu cầu: <strong>ảnh/video + mô tả + cửa hàng + thời gian</strong></p>
+          <p>Nhân viên cửa hàng báo lỗi qua group Zalo/Slack cho Operation.<br>
+          <strong>Bắt buộc đầy đủ:</strong> Hình ảnh/video + club nào bị + bảng điểm nào bị (nếu liên quan) + giải nào bị (nếu liên quan) + các bước thực hiện dẫn đến lỗi.</p>
         </div>
         <div class="flow-down"></div>
         <div class="flow-node">
           <span class="tag">B2</span>
-          <h4>CS trực phân loại</h4>
-          <p>Dùng bộ 3 câu hỏi → xác định P0 / P1 / P2. Không chắc → mặc định P1.</p>
+          <h4>Operation báo lỗi về Thắng</h4>
+          <p>Nếu cửa hàng không vận hành được → <strong>gọi điện Thắng ngay</strong>.<br>Còn lại → message group kèm đầy đủ thông tin. <strong>Thắng tự phân loại P0/P1/P2.</strong></p>
         </div>
         <div class="flow-down"></div>
         <div class="flow-branches">
@@ -551,46 +493,42 @@
 
     <div class="section">
       <div class="section-head">
-        <h2>Khung giờ ứng trực</h2>
-        <p>Không ai phải canh máy cả ngày — chỉ cần sẵn sàng nhận tin</p>
+        <h2>Yêu cầu khi báo lỗi</h2>
+        <p>Báo lỗi thiếu thông tin = không kiểm tra được = chậm xử lý. Bắt buộc đầy đủ các mục sau:</p>
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-        <div class="card">
-          <div style="font-weight:700; margin-bottom:6px;">Khung ngày — 09:00 → 18:00</div>
-          <div style="font-size:13px; color:var(--text-muted); line-height:1.7;">
-            <strong>CS trực:</strong> Phân loại, điều phối<br>
-            <strong>Thắng:</strong> Check phone, xử lý P0/P1
-          </div>
+
+      <div style="display:grid; gap:10px;">
+        <div class="decision">
+          <span class="num" style="font-size:16px;">📸</span>
+          <span><strong>Hình ảnh / Video</strong> — Chụp màn hình hoặc quay video lỗi đang xảy ra. Không chỉ mô tả bằng text.</span>
         </div>
-        <div class="card">
-          <div style="font-weight:700; margin-bottom:6px;">Khung tối — 18:00 → 09:00</div>
-          <div style="font-size:13px; color:var(--text-muted); line-height:1.7;">
-            <strong>Chỉ xử lý P0</strong> — gọi Thắng trực tiếp<br>
-            P1 ghi nhận, sáng hôm sau xử lý<br>
-            P2 tạo ticket, không nhắn ai
-          </div>
+        <div class="decision">
+          <span class="num" style="font-size:16px;">🏪</span>
+          <span><strong>Club nào bị</strong> — Tên club cụ thể, không nói chung chung "bị lỗi".</span>
         </div>
+        <div class="decision">
+          <span class="num" style="font-size:16px;">📊</span>
+          <span><strong>Bảng điểm nào bị</strong> — Nếu lỗi liên quan Scoreboard: bảng điểm số mấy, bàn nào.</span>
+        </div>
+        <div class="decision">
+          <span class="num" style="font-size:16px;">🏆</span>
+          <span><strong>Giải nào bị</strong> — Nếu lỗi liên quan Tournament: tên giải, vòng nào, trận nào.</span>
+        </div>
+        <div class="decision">
+          <span class="num" style="font-size:16px;">🔄</span>
+          <span><strong>Các bước thực hiện dẫn đến lỗi</strong> — Từng bước 1, 2, 3... làm gì thì lỗi xảy ra. Không nói "tự nhiên bị lỗi".</span>
+        </div>
+        <div class="decision">
+          <span class="num" style="font-size:16px;">⏰</span>
+          <span><strong>Thời gian xảy ra</strong> — Lỗi xảy ra lúc mấy giờ, để kiểm tra log server.</span>
+        </div>
+      </div>
+
+      <div class="hint" style="margin-top:16px;">
+        ⚠️ <strong>Thiếu thông tin = trả lại yêu cầu bổ sung.</strong> Operation có trách nhiệm hỏi lại cửa hàng cho đủ trước khi gửi về Thắng.
       </div>
     </div>
 
-    <div class="section">
-      <div class="section-head">
-        <h2>Bảng Escalation</h2>
-      </div>
-      <table>
-        <thead>
-          <tr><th>Tình huống</th><th>Liên hệ</th><th>Cách liên hệ</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>P0 — Hệ thống sập, mất tiền, mất data</td><td><strong>Thắng</strong></td><td>Gọi điện ngay</td></tr>
-          <tr><td>P1 — Ảnh hưởng doanh thu, deal, event</td><td><strong>Thắng</strong></td><td>Message group + tag</td></tr>
-          <tr><td>P1 — Thắng không response sau 1h</td><td><strong>Tech Leader</strong></td><td>Gọi điện trực tiếp</td></tr>
-          <tr><td>P0 ảnh hưởng > 3 cửa hàng</td><td><strong>Thắng</strong> (tự kéo Tech Leader)</td><td>Gọi điện</td></tr>
-          <tr><td>Cần quyết định business</td><td><strong>Thắng</strong></td><td>Gọi điện</td></tr>
-          <tr><td>P2 — Mọi trường hợp</td><td><strong>Không ai</strong></td><td>Tạo ticket Jira</td></tr>
-        </tbody>
-      </table>
-    </div>
   </div>
 
   <!-- ====== TAB 2 ====== -->
@@ -598,162 +536,58 @@
     <div class="section">
       <div class="section-head">
         <h2>Phân công vai trò cuối tuần</h2>
-        <p>Thắng (Dev Leader) phụ trách xử lý lỗi cuối tuần. Thắng tự kéo Tech Leader vào khi cần. CS chỉ cần liên hệ 1 người duy nhất.</p>
+        <p>Dev Leader (Thắng) phụ trách chính, tự quyết định kéo Tech Leader hoặc phân việc cho Dev Team khi cần.</p>
       </div>
 
       <div class="role">
         <div class="role-header">
           <h4>👤 Thắng — Dev Leader</h4>
-          <span class="role-tag">PHỤ TRÁCH CHÍNH — P0 + P1</span>
+          <span class="role-tag">PHỤ TRÁCH CHÍNH</span>
         </div>
         <div class="role-body">
-          <strong>Phụ trách:</strong> Toàn bộ lỗi P0 và P1 cuối tuần. Là đầu mối duy nhất mà CS cần liên hệ.<br><br>
-          <strong>Quyền hạn:</strong> Rollback, hotfix, restart server, tắt/bật feature, liên hệ khách hàng, quyết định business.<br><br>
-          <strong>Escalation:</strong> Tự kéo Tech Leader vào hỗ trợ khi cần (lỗi phức tạp, cần thêm người, ảnh hưởng rộng). CS không cần tự liên hệ Tech Leader.<br><br>
-          <strong>Không cần làm:</strong> P2 tuyệt đối không cuối tuần.
+          <strong>Phụ trách:</strong> Nhận báo lỗi → tự phân loại P0/P1/P2 → xử lý trực tiếp hoặc phân công Dev Team hỗ trợ.<br><br>
+          <strong>Quyền hạn:</strong> Toàn quyền xử lý kỹ thuật — rollback, hotfix, restart server, tắt/bật feature, quyết định business, liên hệ khách hàng.<br><br>
+          <strong>Escalation:</strong> Tự quyết định kéo Tech Leader vào khi cần.<br><br>
+          <strong>Sẵn sàng:</strong> Không cần ngồi máy cả ngày, nhưng ưu tiên mang theo laptop nếu mang được. Phone luôn bật.<br><br>
+          <strong>Chính sách:</strong> Dev Leader có chính sách riêng, không tính OT.
         </div>
-        <div class="hint">CS chỉ cần nhớ 1 đầu mối: Thắng. Phân loại đúng P0/P1/P2 = Thắng chỉ bị gọi khi thực sự cần thiết.</div>
       </div>
 
       <div class="role">
         <div class="role-header">
           <h4>🛠 Tech Leader</h4>
-          <span class="role-tag">HỖ TRỢ KHI THẮNG KÉO VÀO</span>
+          <span class="role-tag">HỖ TRỢ KHI ĐƯỢC KÉO VÀO</span>
         </div>
         <div class="role-body">
-          <strong>Khi nào tham gia:</strong> Chỉ khi Thắng chủ động kéo vào — lỗi phức tạp cần thêm người, ảnh hưởng rộng, hoặc cần chuyên môn sâu hơn.<br><br>
+          <strong>Khi nào tham gia:</strong> Chỉ khi Thắng chủ động kéo vào — lỗi phức tạp, ảnh hưởng rộng, hoặc cần chuyên môn sâu hơn.<br><br>
           <strong>Quyền hạn:</strong> Hỗ trợ debug, fix tạm, restart service, phối hợp cùng Thắng.<br><br>
-          <strong>Không cần làm:</strong> Không cần trực, không cần check message định kỳ. Chỉ cần <strong>phone bật để sẵn sàng khi Thắng gọi</strong>.<br><br>
-          <strong>Bù nghỉ:</strong> Nếu tham gia xử lý cuối tuần → ghi nhận OT hoặc bù nghỉ trong tuần.
+          <strong>Sẵn sàng:</strong> Không cần trực, không cần check message định kỳ. Chỉ cần phone bật để sẵn sàng khi Thắng gọi.<br><br>
+          <strong>Chính sách:</strong> Tech Leader có chính sách riêng, không tính OT.
         </div>
       </div>
 
       <div class="role">
         <div class="role-header">
-          <h4>💬 CS / QA Trực</h4>
-          <span class="role-tag">TUYẾN ĐẦU — PHÂN LOẠI & ĐIỀU PHỐI</span>
+          <h4>💻 Dev Team</h4>
+          <span class="role-tag">HỖ TRỢ DEV LEADER</span>
         </div>
         <div class="role-body">
-          <strong>Nhiệm vụ:</strong> Tiếp nhận báo lỗi → Phân loại P0/P1/P2 → Gọi/nhắn đúng người → Ghi log.<br><br>
-          <strong>Quyền hạn:</strong> Quyết định P1/P2. Với P0 → gọi Thắng ngay, không tự xử lý.<br><br>
-          <strong>Không cần làm:</strong> Fix lỗi. Chỉ cần mô tả đúng, phân loại đúng, gọi đúng người.<br><br>
-          <strong>Xoay ca:</strong> Luân phiên hàng tuần. Lịch trực công bố Thứ 6.
-        </div>
-      </div>
-
-      <div class="role">
-        <div class="role-header">
-          <h4>🏪 Nhân viên cửa hàng</h4>
-          <span class="role-tag">NGƯỜI BÁO LỖI</span>
-        </div>
-        <div class="role-body">
-          <strong>Nhiệm vụ:</strong> Báo lỗi đúng format — ảnh/video, mô tả bước tái hiện, cửa hàng nào, thời gian.<br><br>
-          <strong>Không cần:</strong> Phân loại lỗi, đoán nguyên nhân, tự fix.<br><br>
-          <strong>Lưu ý:</strong> Nếu có workaround → áp dụng trước, phục vụ khách trước, báo lỗi sau. <strong>Không chờ fix xong mới phục vụ khách.</strong>
+          <strong>Khi nào tham gia:</strong> Khi Thắng phân công cụ thể — fix lỗi thuộc module mình phụ trách, hỗ trợ debug, hoặc apply workaround.<br><br>
+          <strong>Không cần làm:</strong> Không cần trực cuối tuần. Chỉ tham gia khi được Thắng gọi và giao việc rõ ràng.<br><br>
+          <strong>Bù nghỉ:</strong> Dev tham gia xử lý cuối tuần → ghi nhận OT hoặc bù nghỉ trong tuần, rõ ràng không nợ.
         </div>
       </div>
     </div>
 
     <div class="section">
       <div class="section-head">
-        <h2>Tại sao không xoay ca Dev on-call?</h2>
+        <h2>Nguyên tắc chung</h2>
       </div>
-      <div class="card" style="font-size:14px; color:var(--text-2); line-height:1.8;">
-        Hệ thống Arena bao gồm nhiều service liên kết chặt: App, ARX, CRM, Scoreboard, Camera, AI, Backend jobs. Lỗi nghiêm trọng thường liên quan đến <strong>server infrastructure, database, hoặc business logic phức tạp</strong> mà chỉ Thắng (Dev Leader) nắm toàn cảnh, và Tech Leader có thể hỗ trợ khi được kéo vào.<br><br>
-        Các dev khác chuyên sâu module riêng → khó xử lý lỗi cross-system cuối tuần. Thay vì ép dev trực không hiệu quả, quy trình tập trung vào:<br><br>
-        <strong>① CS chỉ cần liên hệ 1 người</strong> — Thắng. Đơn giản, không nhầm lẫn<br>
-        <strong>② Thắng tự quyết định escalation</strong> — kéo Tech Leader khi cần, không phụ thuộc CS đánh giá<br>
-        <strong>③ Phân loại tốt + P2 không làm cuối tuần</strong> — giảm 70-80% lỗi phải xử lý ngay
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== TAB 3 ====== -->
-  <div class="tab-content" id="tab-3">
-    <div class="section">
-      <div class="section-head">
-        <h2>Template báo lỗi cuối tuần</h2>
-        <p>Copy gửi vào group — càng đủ thông tin, càng xử lý nhanh</p>
-      </div>
-
-      <div class="tpl">
-        <span class="tl">Template Zalo / Slack</span>
-        <button class="cbtn" onclick="copyTpl(this)">Copy</button>
-🚨 <strong>[P0 / P1 / P2]</strong> — Báo lỗi cuối tuần
-
-<strong>Cửa hàng:</strong> [Tên cửa hàng]
-<strong>Thời gian:</strong> [HH:mm — DD/MM]
-<strong>Người báo:</strong> [Tên]
-
-<strong>Mô tả lỗi:</strong>
-[Lỗi gì, ở đâu, xảy ra khi nào]
-
-<strong>Bước tái hiện:</strong>
-1. ...
-2. ...
-3. ...
-
-<strong>Ảnh/Video:</strong> [Đính kèm]
-
-<strong>Mức ảnh hưởng:</strong>
-☐ Không vận hành được (P0)
-☐ Mất tiền / mất khách hôm nay (P1)
-☐ Có workaround, không gấp (P2)
-
-<strong>Workaround đã áp dụng:</strong> [Nếu có]
-      </div>
-
-      <div class="tpl">
-        <span class="tl">Template Jira Ticket — P2</span>
-        <button class="cbtn" onclick="copyTpl(this)">Copy</button>
-<strong>Title:</strong> [BUG] [Module] — Mô tả ngắn
-
-<strong>Priority:</strong> P2 — Weekend Report
-<strong>Reporter:</strong> [Tên]
-<strong>Date:</strong> [DD/MM/YYYY]
-
-<strong>Description:</strong>
-Lỗi phát hiện cuối tuần. Không khẩn cấp.
-
-<strong>Steps to Reproduce:</strong>
-1. ...
-2. ...
-
-<strong>Expected:</strong> [Kết quả mong muốn]
-<strong>Actual:</strong> [Kết quả thực tế]
-
-<strong>Attachments:</strong> [Ảnh/Video]
-<strong>Module:</strong> [App / ARX / CRM / Scoreboard / Camera / Web]
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-head">
-        <h2>Checklist sáng Thứ 2</h2>
-        <p>Click để đánh dấu hoàn thành</p>
-      </div>
-      <ul class="checklist">
-        <li onclick="this.classList.toggle('done')"><span class="ck"></span><span>Review toàn bộ Weekend Incident Log</span></li>
-        <li onclick="this.classList.toggle('done')"><span class="ck"></span><span>Kiểm tra P0/P1 đã fix chính thức chưa (không chỉ workaround)</span></li>
-        <li onclick="this.classList.toggle('done')"><span class="ck"></span><span>Review ticket P2 mới → đưa vào sprint backlog</span></li>
-        <li onclick="this.classList.toggle('done')"><span class="ck"></span><span>Ghi nhận OT / bù nghỉ cho Thắng + Tech Leader nếu có xử lý cuối tuần</span></li>
-        <li onclick="this.classList.toggle('done')"><span class="ck"></span><span>Tổng hợp vào standup: lỗi gì, root cause, action item</span></li>
-        <li onclick="this.classList.toggle('done')"><span class="ck"></span><span>Lỗi lặp lại > 2 tuần → tạo Epic fix tận gốc</span></li>
-        <li onclick="this.classList.toggle('done')"><span class="ck"></span><span>Cập nhật lịch trực CS tuần tới</span></li>
-      </ul>
-    </div>
-
-    <div class="section">
-      <div class="section-head">
-        <h2>Nguyên tắc bảo vệ work-life balance</h2>
-      </div>
-      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Thắng không cần ngồi máy cả ngày — chỉ phone bật. Mở máy chỉ khi P0/P1 cần fix.</div>
-      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Tech Leader chỉ tham gia khi Thắng chủ động kéo vào — không cần trực hay check message.</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Thắng ưu tiên mang laptop theo nếu mang được — không bắt buộc ngồi máy cả ngày.</div>
       <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;P1 → workaround trước, fix chính Thứ 2. Không yêu cầu fix hoàn chỉnh cuối tuần.</div>
-      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;P2 = tuyệt đối không làm cuối tuần. CS giải thích quy trình nếu ai yêu cầu fix P2 ngay.</div>
-      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Tech Leader xử lý cuối tuần = bù nghỉ hoặc OT rõ ràng, không nợ.</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;P2 = tuyệt đối không làm cuối tuần.</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Dev Team tham gia xử lý cuối tuần → bù nghỉ hoặc OT rõ ràng.</div>
       <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Lỗi lặp > 2 tuần → ưu tiên fix tận gốc vào sprint, không chấp nhận "lỗi quen rồi".</div>
-      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;CS xoay ca công bằng, lịch trực công bố Thứ 6.</div>
     </div>
   </div>
 
@@ -763,18 +597,6 @@ Lỗi phát hiện cuối tuần. Không khẩn cấp.
 function switchTab(i) {
   document.querySelectorAll('.tab').forEach((t, j) => t.classList.toggle('active', j === i));
   document.querySelectorAll('.tab-content').forEach((c, j) => c.classList.toggle('active', j === i));
-}
-
-function copyTpl(btn) {
-  const block = btn.parentElement;
-  const clone = block.cloneNode(true);
-  clone.querySelector('.cbtn')?.remove();
-  clone.querySelector('.tl')?.remove();
-  const text = clone.textContent.trim();
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = '✅ Copied!';
-    setTimeout(() => btn.textContent = 'Copy', 2000);
-  });
 }
 </script>
 </body>
