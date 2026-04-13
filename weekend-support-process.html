@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quy Trình Support Lỗi Cuối Tuần — Arena Billiard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f8f9fb;
+    --surface-2: #f1f3f7;
+    --surface-3: #e8ecf1;
+    --border: #e2e6ed;
+    --border-light: #eef0f4;
+    --text: #1a1f2e;
+    --text-2: #3d4560;
+    --text-muted: #7a839b;
+    --accent: #2563eb;
+    --accent-light: #eff4ff;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --red-border: #fecaca;
+    --red-light: #fee2e2;
+    --orange: #d97706;
+    --orange-bg: #fffbeb;
+    --orange-border: #fde68a;
+    --orange-light: #fef3c7;
+    --green: #16a34a;
+    --green-bg: #f0fdf4;
+    --green-border: #bbf7d0;
+    --green-light: #dcfce7;
+    --font: 'IBM Plex Sans', -apple-system, sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  .header {
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .header .org {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+  }
+
+  .header p { color: var(--text-muted); font-size: 15px; }
+
+  .header .meta {
+    margin-top: 16px;
+    display: flex;
+    gap: 24px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 32px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .tab {
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+  }
+
+  .tab:hover { color: var(--text-2); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .section { margin-bottom: 28px; }
+
+  .section-head { margin-bottom: 20px; }
+  .section-head h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .section-head p { font-size: 13px; color: var(--text-muted); }
+
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  /* Level Cards */
+  .level {
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 14px;
+    border-left: 4px solid;
+  }
+
+  .level.p0 { background: var(--red-bg); border: 1px solid var(--red-border); border-left: 4px solid var(--red); }
+  .level.p1 { background: var(--orange-bg); border: 1px solid var(--orange-border); border-left: 4px solid var(--orange); }
+  .level.p2 { background: var(--green-bg); border: 1px solid var(--green-border); border-left: 4px solid var(--green); }
+
+  .level-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .ptag {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .level.p0 .ptag { background: var(--red); color: #fff; }
+  .level.p1 .ptag { background: var(--orange); color: #fff; }
+  .level.p2 .ptag { background: var(--green); color: #fff; }
+
+  .level-top h3 { font-size: 15px; font-weight: 700; }
+  .level-top .sla { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+
+  .level ul { padding-left: 18px; margin-bottom: 14px; }
+  .level li { font-size: 14px; color: var(--text-2); margin-bottom: 5px; line-height: 1.6; }
+  .level li strong { color: var(--text); }
+
+  .action-box {
+    background: rgba(255,255,255,0.6);
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text-2);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    line-height: 1.6;
+  }
+
+  .action-box .icon { flex-shrink: 0; }
+
+  .decision {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 14px;
+  }
+
+  .decision .num { font-family: var(--mono); font-weight: 600; color: var(--accent); flex-shrink: 0; min-width: 20px; }
+
+  .result {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .result.r0 { background: var(--red-light); color: var(--red); }
+  .result.r1 { background: var(--orange-light); color: var(--orange); }
+  .result.r2 { background: var(--green-light); color: var(--green); }
+
+  .hint {
+    background: var(--accent-light);
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  /* Flow */
+  .flow { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 16px 0; }
+
+  .flow-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 24px;
+    width: 100%;
+    max-width: 520px;
+    position: relative;
+  }
+
+  .flow-node .tag {
+    position: absolute;
+    top: -9px; left: 20px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 1px 10px;
+    border-radius: 4px;
+  }
+
+  .flow-node h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .flow-node p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+  .flow-down { width: 1px; height: 24px; border-left: 2px dashed var(--border); }
+
+  .flow-branches { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; width: 100%; }
+
+  .branch { border-radius: 8px; padding: 16px; text-align: center; }
+  .branch h5 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .branch p { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+
+  .branch.br0 { background: var(--red-bg); border: 1px solid var(--red-border); }
+  .branch.br0 h5 { color: var(--red); }
+  .branch.br1 { background: var(--orange-bg); border: 1px solid var(--orange-border); }
+  .branch.br1 h5 { color: var(--orange); }
+  .branch.br2 { background: var(--green-bg); border: 1px solid var(--green-border); }
+  .branch.br2 h5 { color: var(--green); }
+
+  /* Role */
+  .role {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 14px;
+  }
+
+  .role-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .role-header h4 { font-size: 15px; font-weight: 700; }
+
+  .role-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+
+  .role-body { font-size: 14px; color: var(--text-2); line-height: 1.8; }
+  .role-body strong { color: var(--text); }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border-light); color: var(--text-2); }
+  tr:last-child td { border-bottom: none; }
+
+  /* Template */
+  .tpl {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.9;
+    color: var(--text-2);
+    white-space: pre-line;
+    position: relative;
+  }
+
+  .tpl .tl { position: absolute; top: -9px; left: 16px; font-family: var(--font); font-size: 12px; font-weight: 600; color: var(--text); background: var(--bg); border: 1px solid var(--border); padding: 1px 12px; border-radius: 4px; }
+
+  .cbtn {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 12px; padding: 4px 12px;
+    background: var(--bg); color: var(--text-muted);
+    border: 1px solid var(--border); border-radius: 5px;
+    cursor: pointer; font-family: var(--font); transition: all 0.15s;
+  }
+  .cbtn:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* Checklist */
+  .checklist { list-style: none; }
+
+  .checklist li {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.1s;
+  }
+
+  .checklist li:hover { background: var(--surface); }
+
+  .checklist li .ck {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    transition: all 0.15s;
+  }
+
+  .checklist li.done .ck { background: var(--green); border-color: var(--green); color: #fff; }
+  .checklist li.done > span:last-child { text-decoration: line-through; color: var(--text-muted); }
+
+  .rule {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--text-2);
+  }
+  .rule strong { color: var(--text); }
+
+  @media (max-width: 700px) {
+    .container { padding: 16px 14px 60px; }
+    .header h1 { font-size: 22px; }
+    .tabs { overflow-x: auto; }
+    .tab { white-space: nowrap; padding: 10px 14px; font-size: 13px; }
+    .flow-branches { grid-template-columns: 1fr; }
+    .header .meta { flex-direction: column; gap: 4px; }
+    .level-top .sla { margin-left: 0; }
+  }
+
+  @media print {
+    .tabs { display: none; }
+    .tab-content { display: block !important; page-break-inside: avoid; margin-bottom: 32px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="org">Arena Billiard — Internal SOP</div>
+    <h1>Quy Trình Support Lỗi Cuối Tuần</h1>
+    <p>Phân loại lỗi theo mức độ, xác định rõ ai xử lý, giảm thiểu tối đa làm việc ngoài giờ</p>
+    <div class="meta">
+      <span>Version 1.0</span>
+      <span>Cập nhật: 13/04/2026</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(0)">Phân Loại Lỗi</button>
+    <button class="tab" onclick="switchTab(1)">Quy Trình Xử Lý</button>
+    <button class="tab" onclick="switchTab(2)">Vai Trò & Phân Công</button>
+    <button class="tab" onclick="switchTab(3)">Template & Checklist</button>
+  </div>
+
+  <!-- ====== TAB 0 ====== -->
+  <div class="tab-content active" id="tab-0">
+    <div class="section">
+      <div class="section-head">
+        <h2>Bảng phân loại lỗi</h2>
+        <p>Nguyên tắc: Chỉ xử lý ngay những gì thực sự ảnh hưởng vận hành. Còn lại → ticket Thứ 2.</p>
+      </div>
+
+      <div class="level p0">
+        <div class="level-top">
+          <span class="ptag">P0</span>
+          <h3>Nghiêm trọng — Xử lý NGAY</h3>
+          <span class="sla">≤ 15 phút response</span>
+        </div>
+        <ul>
+          <li><strong>Hệ thống sập hoàn toàn</strong> — App/ARX/CRM không truy cập được, server down</li>
+          <li><strong>Không tính tiền được</strong> — Lỗi POS, thanh toán, không chốt bill</li>
+          <li><strong>Mất dữ liệu</strong> — Database lỗi, data session bị xóa/sai khi đang phục vụ</li>
+          <li><strong>Bảo mật</strong> — Bị tấn công, dữ liệu rò rỉ, truy cập trái phép</li>
+        </ul>
+        <div class="action-box">
+          <span class="icon">⚡</span>
+          <span><strong>Người xử lý: Thắng (Dev Leader)</strong> — CS gọi điện trực tiếp cho Thắng ngay lập tức. Không chờ message. Thắng sẽ tự kéo Tech Leader vào hỗ trợ nếu cần.</span>
+        </div>
+      </div>
+
+      <div class="level p1">
+        <div class="level-top">
+          <span class="ptag">P1</span>
+          <h3>Ảnh hưởng chốt deal — Xử lý trong ngày</h3>
+          <span class="sla">≤ 2 giờ response</span>
+        </div>
+        <ul>
+          <li><strong>Lỗi ảnh hưởng doanh thu</strong> — Promotion sai, giá sai, discount áp sai</li>
+          <li><strong>Chốt deal bị hỏng 1 phần</strong> — In bill lỗi, không gửi invoice, export báo cáo hỏng</li>
+          <li><strong>Trải nghiệm khách giảm nghiêm trọng</strong> — Camera lag nặng, scoreboard sai điểm, app crash phổ biến</li>
+          <li><strong>Cửa hàng đang có event/giải đấu</strong> — Bất kỳ lỗi nào khi đang tổ chức sự kiện</li>
+        </ul>
+        <div class="action-box">
+          <span class="icon">💬</span>
+          <span><strong>Người xử lý: Thắng (Dev Leader)</strong> — CS message group kèm mô tả + ảnh/video. Thắng đánh giá → hướng dẫn workaround hoặc fix tạm. Fix chính thức Thứ 2. Thắng sẽ tự kéo Tech Leader vào nếu cần hỗ trợ.</span>
+        </div>
+      </div>
+
+      <div class="level p2">
+        <div class="level-top">
+          <span class="ptag">P2</span>
+          <h3>Không khẩn cấp — Lên Ticket xử lý sau</h3>
+          <span class="sla">Ticket trước 10h Thứ 2</span>
+        </div>
+        <ul>
+          <li><strong>Lỗi UI/UX nhỏ</strong> — Sai font, lệch layout, hiển thị không đẹp</li>
+          <li><strong>Tính năng phụ hỏng</strong> — Filter báo cáo lỗi, export CSV sai format</li>
+          <li><strong>Request cải tiến</strong> — "Muốn thêm cột X", "Muốn đổi flow Y"</li>
+          <li><strong>Lỗi đã có workaround</strong> — Nhân viên cửa hàng tự xử lý thủ công</li>
+          <li><strong>Lỗi không ảnh hưởng vận hành</strong> — Notification lỗi, avatar lỗi, minor bug</li>
+        </ul>
+        <div class="action-box">
+          <span class="icon">📌</span>
+          <span><strong>Không ai xử lý cuối tuần.</strong> Người báo lỗi tự tạo ticket Jira theo template. PM review sáng Thứ 2 đưa vào sprint. Tuyệt đối không gọi/nhắn ngoài giờ cho P2.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>3 câu hỏi phân loại nhanh</h2>
+        <p>CS trực dùng bộ câu hỏi này để xác định mức ưu tiên</p>
+      </div>
+      <div class="decision">
+        <span class="num">❶</span>
+        <span>Lỗi này có khiến cửa hàng <strong>không vận hành được</strong> không? → CÓ = <span class="result r0">P0</span> &nbsp;KHÔNG = Hỏi tiếp ❷</span>
+      </div>
+      <div class="decision">
+        <span class="num">❷</span>
+        <span>Lỗi này có đang <strong>làm mất tiền hoặc mất khách</strong> hôm nay không? → CÓ = <span class="result r1">P1</span> &nbsp;KHÔNG = Hỏi tiếp ❸</span>
+      </div>
+      <div class="decision">
+        <span class="num">❸</span>
+        <span>Còn lại → Dù có workaround hay không = <span class="result r2">P2</span> — tạo ticket, Thứ 2 xử lý</span>
+      </div>
+      <div class="hint">
+        💡 Nếu CS <strong>không chắc</strong> → mặc định <strong>P1</strong> và message Thắng. An toàn hơn là bỏ sót.
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== TAB 1 ====== -->
+  <div class="tab-content" id="tab-1">
+    <div class="section">
+      <div class="section-head">
+        <h2>Luồng xử lý khi nhận báo lỗi</h2>
+        <p>Từ nhận lỗi → phân loại → xử lý → đóng lỗi</p>
+      </div>
+      <div class="flow">
+        <div class="flow-node">
+          <span class="tag">B1</span>
+          <h4>Nhận báo lỗi</h4>
+          <p>Nhân viên cửa hàng / CS báo qua group Zalo/Slack.<br>Yêu cầu: <strong>ảnh/video + mô tả + cửa hàng + thời gian</strong></p>
+        </div>
+        <div class="flow-down"></div>
+        <div class="flow-node">
+          <span class="tag">B2</span>
+          <h4>CS trực phân loại</h4>
+          <p>Dùng bộ 3 câu hỏi → xác định P0 / P1 / P2. Không chắc → mặc định P1.</p>
+        </div>
+        <div class="flow-down"></div>
+        <div class="flow-branches">
+          <div class="branch br0">
+            <h5>P0 → Gọi Thắng</h5>
+            <p>Gọi điện trực tiếp.<br>Thắng fix / rollback / restart.<br>Tự kéo Tech Leader nếu cần.</p>
+          </div>
+          <div class="branch br1">
+            <h5>P1 → Nhắn Thắng</h5>
+            <p>Message group kèm detail.<br>Thắng đánh giá + workaround.<br>Fix chính Thứ 2.</p>
+          </div>
+          <div class="branch br2">
+            <h5>P2 → Tạo Ticket</h5>
+            <p>Tạo Jira ticket.<br>Không nhắn ai.<br>PM review Thứ 2.</p>
+          </div>
+        </div>
+        <div class="flow-down"></div>
+        <div class="flow-node">
+          <span class="tag">B3</span>
+          <h4>Ghi log</h4>
+          <p>Mọi lỗi (kể cả P2) đều ghi vào <strong>Weekend Incident Log</strong>. PM review sáng Thứ 2.</p>
+        </div>
+        <div class="flow-down"></div>
+        <div class="flow-node">
+          <span class="tag">B4</span>
+          <h4>Review Thứ 2</h4>
+          <p>Standup đầu tuần: lỗi gì xảy ra, root cause, action item, ghi nhận đóng góp.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Khung giờ ứng trực</h2>
+        <p>Không ai phải canh máy cả ngày — chỉ cần sẵn sàng nhận tin</p>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="card">
+          <div style="font-weight:700; margin-bottom:6px;">Khung ngày — 09:00 → 18:00</div>
+          <div style="font-size:13px; color:var(--text-muted); line-height:1.7;">
+            <strong>CS trực:</strong> Phân loại, điều phối<br>
+            <strong>Thắng:</strong> Check phone, xử lý P0/P1
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-weight:700; margin-bottom:6px;">Khung tối — 18:00 → 09:00</div>
+          <div style="font-size:13px; color:var(--text-muted); line-height:1.7;">
+            <strong>Chỉ xử lý P0</strong> — gọi Thắng trực tiếp<br>
+            P1 ghi nhận, sáng hôm sau xử lý<br>
+            P2 tạo ticket, không nhắn ai
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Bảng Escalation</h2>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Tình huống</th><th>Liên hệ</th><th>Cách liên hệ</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>P0 — Hệ thống sập, mất tiền, mất data</td><td><strong>Thắng</strong></td><td>Gọi điện ngay</td></tr>
+          <tr><td>P1 — Ảnh hưởng doanh thu, deal, event</td><td><strong>Thắng</strong></td><td>Message group + tag</td></tr>
+          <tr><td>P1 — Thắng không response sau 1h</td><td><strong>Tech Leader</strong></td><td>Gọi điện trực tiếp</td></tr>
+          <tr><td>P0 ảnh hưởng > 3 cửa hàng</td><td><strong>Thắng</strong> (tự kéo Tech Leader)</td><td>Gọi điện</td></tr>
+          <tr><td>Cần quyết định business</td><td><strong>Thắng</strong></td><td>Gọi điện</td></tr>
+          <tr><td>P2 — Mọi trường hợp</td><td><strong>Không ai</strong></td><td>Tạo ticket Jira</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ====== TAB 2 ====== -->
+  <div class="tab-content" id="tab-2">
+    <div class="section">
+      <div class="section-head">
+        <h2>Phân công vai trò cuối tuần</h2>
+        <p>Thắng (Dev Leader) phụ trách xử lý lỗi cuối tuần. Thắng tự kéo Tech Leader vào khi cần. CS chỉ cần liên hệ 1 người duy nhất.</p>
+      </div>
+
+      <div class="role">
+        <div class="role-header">
+          <h4>👤 Thắng — Dev Leader</h4>
+          <span class="role-tag">PHỤ TRÁCH CHÍNH — P0 + P1</span>
+        </div>
+        <div class="role-body">
+          <strong>Phụ trách:</strong> Toàn bộ lỗi P0 và P1 cuối tuần. Là đầu mối duy nhất mà CS cần liên hệ.<br><br>
+          <strong>Quyền hạn:</strong> Rollback, hotfix, restart server, tắt/bật feature, liên hệ khách hàng, quyết định business.<br><br>
+          <strong>Escalation:</strong> Tự kéo Tech Leader vào hỗ trợ khi cần (lỗi phức tạp, cần thêm người, ảnh hưởng rộng). CS không cần tự liên hệ Tech Leader.<br><br>
+          <strong>Không cần làm:</strong> P2 tuyệt đối không cuối tuần.
+        </div>
+        <div class="hint">CS chỉ cần nhớ 1 đầu mối: Thắng. Phân loại đúng P0/P1/P2 = Thắng chỉ bị gọi khi thực sự cần thiết.</div>
+      </div>
+
+      <div class="role">
+        <div class="role-header">
+          <h4>🛠 Tech Leader</h4>
+          <span class="role-tag">HỖ TRỢ KHI THẮNG KÉO VÀO</span>
+        </div>
+        <div class="role-body">
+          <strong>Khi nào tham gia:</strong> Chỉ khi Thắng chủ động kéo vào — lỗi phức tạp cần thêm người, ảnh hưởng rộng, hoặc cần chuyên môn sâu hơn.<br><br>
+          <strong>Quyền hạn:</strong> Hỗ trợ debug, fix tạm, restart service, phối hợp cùng Thắng.<br><br>
+          <strong>Không cần làm:</strong> Không cần trực, không cần check message định kỳ. Chỉ cần <strong>phone bật để sẵn sàng khi Thắng gọi</strong>.<br><br>
+          <strong>Bù nghỉ:</strong> Nếu tham gia xử lý cuối tuần → ghi nhận OT hoặc bù nghỉ trong tuần.
+        </div>
+      </div>
+
+      <div class="role">
+        <div class="role-header">
+          <h4>💬 CS / QA Trực</h4>
+          <span class="role-tag">TUYẾN ĐẦU — PHÂN LOẠI & ĐIỀU PHỐI</span>
+        </div>
+        <div class="role-body">
+          <strong>Nhiệm vụ:</strong> Tiếp nhận báo lỗi → Phân loại P0/P1/P2 → Gọi/nhắn đúng người → Ghi log.<br><br>
+          <strong>Quyền hạn:</strong> Quyết định P1/P2. Với P0 → gọi Thắng ngay, không tự xử lý.<br><br>
+          <strong>Không cần làm:</strong> Fix lỗi. Chỉ cần mô tả đúng, phân loại đúng, gọi đúng người.<br><br>
+          <strong>Xoay ca:</strong> Luân phiên hàng tuần. Lịch trực công bố Thứ 6.
+        </div>
+      </div>
+
+      <div class="role">
+        <div class="role-header">
+          <h4>🏪 Nhân viên cửa hàng</h4>
+          <span class="role-tag">NGƯỜI BÁO LỖI</span>
+        </div>
+        <div class="role-body">
+          <strong>Nhiệm vụ:</strong> Báo lỗi đúng format — ảnh/video, mô tả bước tái hiện, cửa hàng nào, thời gian.<br><br>
+          <strong>Không cần:</strong> Phân loại lỗi, đoán nguyên nhân, tự fix.<br><br>
+          <strong>Lưu ý:</strong> Nếu có workaround → áp dụng trước, phục vụ khách trước, báo lỗi sau. <strong>Không chờ fix xong mới phục vụ khách.</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Tại sao không xoay ca Dev on-call?</h2>
+      </div>
+      <div class="card" style="font-size:14px; color:var(--text-2); line-height:1.8;">
+        Hệ thống Arena bao gồm nhiều service liên kết chặt: App, ARX, CRM, Scoreboard, Camera, AI, Backend jobs. Lỗi nghiêm trọng thường liên quan đến <strong>server infrastructure, database, hoặc business logic phức tạp</strong> mà chỉ Thắng (Dev Leader) nắm toàn cảnh, và Tech Leader có thể hỗ trợ khi được kéo vào.<br><br>
+        Các dev khác chuyên sâu module riêng → khó xử lý lỗi cross-system cuối tuần. Thay vì ép dev trực không hiệu quả, quy trình tập trung vào:<br><br>
+        <strong>① CS chỉ cần liên hệ 1 người</strong> — Thắng. Đơn giản, không nhầm lẫn<br>
+        <strong>② Thắng tự quyết định escalation</strong> — kéo Tech Leader khi cần, không phụ thuộc CS đánh giá<br>
+        <strong>③ Phân loại tốt + P2 không làm cuối tuần</strong> — giảm 70-80% lỗi phải xử lý ngay
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== TAB 3 ====== -->
+  <div class="tab-content" id="tab-3">
+    <div class="section">
+      <div class="section-head">
+        <h2>Template báo lỗi cuối tuần</h2>
+        <p>Copy gửi vào group — càng đủ thông tin, càng xử lý nhanh</p>
+      </div>
+
+      <div class="tpl">
+        <span class="tl">Template Zalo / Slack</span>
+        <button class="cbtn" onclick="copyTpl(this)">Copy</button>
+🚨 <strong>[P0 / P1 / P2]</strong> — Báo lỗi cuối tuần
+
+<strong>Cửa hàng:</strong> [Tên cửa hàng]
+<strong>Thời gian:</strong> [HH:mm — DD/MM]
+<strong>Người báo:</strong> [Tên]
+
+<strong>Mô tả lỗi:</strong>
+[Lỗi gì, ở đâu, xảy ra khi nào]
+
+<strong>Bước tái hiện:</strong>
+1. ...
+2. ...
+3. ...
+
+<strong>Ảnh/Video:</strong> [Đính kèm]
+
+<strong>Mức ảnh hưởng:</strong>
+☐ Không vận hành được (P0)
+☐ Mất tiền / mất khách hôm nay (P1)
+☐ Có workaround, không gấp (P2)
+
+<strong>Workaround đã áp dụng:</strong> [Nếu có]
+      </div>
+
+      <div class="tpl">
+        <span class="tl">Template Jira Ticket — P2</span>
+        <button class="cbtn" onclick="copyTpl(this)">Copy</button>
+<strong>Title:</strong> [BUG] [Module] — Mô tả ngắn
+
+<strong>Priority:</strong> P2 — Weekend Report
+<strong>Reporter:</strong> [Tên]
+<strong>Date:</strong> [DD/MM/YYYY]
+
+<strong>Description:</strong>
+Lỗi phát hiện cuối tuần. Không khẩn cấp.
+
+<strong>Steps to Reproduce:</strong>
+1. ...
+2. ...
+
+<strong>Expected:</strong> [Kết quả mong muốn]
+<strong>Actual:</strong> [Kết quả thực tế]
+
+<strong>Attachments:</strong> [Ảnh/Video]
+<strong>Module:</strong> [App / ARX / CRM / Scoreboard / Camera / Web]
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Checklist sáng Thứ 2</h2>
+        <p>Click để đánh dấu hoàn thành</p>
+      </div>
+      <ul class="checklist">
+        <li onclick="this.classList.toggle('done')"><span class="ck"></span><span>Review toàn bộ Weekend Incident Log</span></li>
+        <li onclick="this.classList.toggle('done')"><span class="ck"></span><span>Kiểm tra P0/P1 đã fix chính thức chưa (không chỉ workaround)</span></li>
+        <li onclick="this.classList.toggle('done')"><span class="ck"></span><span>Review ticket P2 mới → đưa vào sprint backlog</span></li>
+        <li onclick="this.classList.toggle('done')"><span class="ck"></span><span>Ghi nhận OT / bù nghỉ cho Thắng + Tech Leader nếu có xử lý cuối tuần</span></li>
+        <li onclick="this.classList.toggle('done')"><span class="ck"></span><span>Tổng hợp vào standup: lỗi gì, root cause, action item</span></li>
+        <li onclick="this.classList.toggle('done')"><span class="ck"></span><span>Lỗi lặp lại > 2 tuần → tạo Epic fix tận gốc</span></li>
+        <li onclick="this.classList.toggle('done')"><span class="ck"></span><span>Cập nhật lịch trực CS tuần tới</span></li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Nguyên tắc bảo vệ work-life balance</h2>
+      </div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Thắng không cần ngồi máy cả ngày — chỉ phone bật. Mở máy chỉ khi P0/P1 cần fix.</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Tech Leader chỉ tham gia khi Thắng chủ động kéo vào — không cần trực hay check message.</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;P1 → workaround trước, fix chính Thứ 2. Không yêu cầu fix hoàn chỉnh cuối tuần.</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;P2 = tuyệt đối không làm cuối tuần. CS giải thích quy trình nếu ai yêu cầu fix P2 ngay.</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Tech Leader xử lý cuối tuần = bù nghỉ hoặc OT rõ ràng, không nợ.</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Lỗi lặp > 2 tuần → ưu tiên fix tận gốc vào sprint, không chấp nhận "lỗi quen rồi".</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;CS xoay ca công bằng, lịch trực công bố Thứ 6.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(i) {
+  document.querySelectorAll('.tab').forEach((t, j) => t.classList.toggle('active', j === i));
+  document.querySelectorAll('.tab-content').forEach((c, j) => c.classList.toggle('active', j === i));
+}
+
+function copyTpl(btn) {
+  const block = btn.parentElement;
+  const clone = block.cloneNode(true);
+  clone.querySelector('.cbtn')?.remove();
+  clone.querySelector('.tl')?.remove();
+  const text = clone.textContent.trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+</script>
+</body>
+</html>
