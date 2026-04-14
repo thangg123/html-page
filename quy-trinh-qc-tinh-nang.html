@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quy Trình QC Tính Năng — Arena Billiard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f8f9fb;
+    --surface-2: #f1f3f7;
+    --surface-3: #e8ecf1;
+    --border: #e2e6ed;
+    --border-light: #eef0f4;
+    --text: #1a1f2e;
+    --text-2: #3d4560;
+    --text-muted: #7a839b;
+    --accent: #2563eb;
+    --accent-light: #eff4ff;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --red-border: #fecaca;
+    --red-light: #fee2e2;
+    --orange: #d97706;
+    --orange-bg: #fffbeb;
+    --orange-border: #fde68a;
+    --orange-light: #fef3c7;
+    --green: #16a34a;
+    --green-bg: #f0fdf4;
+    --green-border: #bbf7d0;
+    --green-light: #dcfce7;
+    --purple: #7c3aed;
+    --purple-bg: #f5f3ff;
+    --purple-border: #c4b5fd;
+    --purple-light: #ede9fe;
+    --cyan: #0891b2;
+    --cyan-bg: #ecfeff;
+    --cyan-border: #a5f3fc;
+    --font: 'IBM Plex Sans', -apple-system, sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  .header {
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .header .org {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+  }
+
+  .header p { color: var(--text-muted); font-size: 15px; }
+
+  .header .meta {
+    margin-top: 16px;
+    display: flex;
+    gap: 24px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 32px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .tab {
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+  }
+
+  .tab:hover { color: var(--text-2); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .section { margin-bottom: 28px; }
+
+  .section-head { margin-bottom: 20px; }
+  .section-head h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .section-head p { font-size: 13px; color: var(--text-muted); }
+
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  /* Phase Cards */
+  .phase {
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 14px;
+    border-left: 4px solid;
+  }
+
+  .phase.plan { background: var(--purple-bg); border: 1px solid var(--purple-border); border-left: 4px solid var(--purple); }
+  .phase.dev { background: var(--cyan-bg); border: 1px solid var(--cyan-border); border-left: 4px solid var(--cyan); }
+  .phase.test { background: var(--accent-light); border: 1px solid #bfdbfe; border-left: 4px solid var(--accent); }
+  .phase.release { background: var(--green-bg); border: 1px solid var(--green-border); border-left: 4px solid var(--green); }
+  .phase.feedback { background: var(--orange-bg); border: 1px solid var(--orange-border); border-left: 4px solid var(--orange); }
+
+  .phase-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .ptag {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    color: #fff;
+  }
+
+  .phase.plan .ptag { background: var(--purple); }
+  .phase.dev .ptag { background: var(--cyan); }
+  .phase.test .ptag { background: var(--accent); }
+  .phase.release .ptag { background: var(--green); }
+  .phase.feedback .ptag { background: var(--orange); }
+
+  .phase-top h3 { font-size: 15px; font-weight: 700; }
+
+  .phase ul { padding-left: 18px; margin-bottom: 14px; }
+  .phase li { font-size: 14px; color: var(--text-2); margin-bottom: 5px; line-height: 1.6; }
+  .phase li strong { color: var(--text); }
+
+  .action-box {
+    background: rgba(255,255,255,0.6);
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text-2);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    line-height: 1.6;
+  }
+
+  .action-box .icon { flex-shrink: 0; }
+
+  .decision {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 14px;
+  }
+
+  .decision .num { font-family: var(--mono); font-weight: 600; color: var(--accent); flex-shrink: 0; min-width: 20px; }
+
+  .result {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .result.pass { background: var(--green-light); color: var(--green); }
+  .result.fail { background: var(--red-light); color: var(--red); }
+  .result.wait { background: var(--orange-light); color: var(--orange); }
+
+  .hint {
+    background: var(--accent-light);
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  .hint.warn {
+    background: var(--red-bg);
+    border-color: var(--red-border);
+    color: var(--red);
+  }
+
+  .hint.ok {
+    background: var(--green-bg);
+    border-color: var(--green-border);
+    color: var(--green);
+  }
+
+  /* Flow */
+  .flow { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 16px 0; }
+
+  .flow-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 24px;
+    width: 100%;
+    max-width: 520px;
+    position: relative;
+  }
+
+  .flow-node .tag {
+    position: absolute;
+    top: -9px; left: 20px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 1px 10px;
+    border-radius: 4px;
+  }
+
+  .flow-node .tag.purple { color: var(--purple); }
+  .flow-node .tag.cyan { color: var(--cyan); }
+  .flow-node .tag.blue { color: var(--accent); }
+  .flow-node .tag.green { color: var(--green); }
+  .flow-node .tag.orange { color: var(--orange); }
+
+  .flow-node h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .flow-node p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+  .flow-down { width: 1px; height: 24px; border-left: 2px dashed var(--border); }
+
+  .flow-branches { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 520px; }
+
+  .branch { border-radius: 8px; padding: 16px; text-align: center; }
+  .branch h5 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .branch p { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+
+  .branch.pass { background: var(--green-bg); border: 1px solid var(--green-border); }
+  .branch.pass h5 { color: var(--green); }
+  .branch.fail { background: var(--red-bg); border: 1px solid var(--red-border); }
+  .branch.fail h5 { color: var(--red); }
+
+  .flow-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 14px;
+    border-radius: 20px;
+    margin: -4px 0;
+    z-index: 1;
+    position: relative;
+  }
+
+  .flow-label.required { background: var(--red-light); color: var(--red); border: 1px solid var(--red-border); }
+  .flow-label.info { background: var(--accent-light); color: var(--accent); border: 1px solid #bfdbfe; }
+  .flow-label.ok { background: var(--green-light); color: var(--green); border: 1px solid var(--green-border); }
+
+  /* Role */
+  .role {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 14px;
+  }
+
+  .role-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .role-header h4 { font-size: 15px; font-weight: 700; }
+
+  .role-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+
+  .role-body { font-size: 14px; color: var(--text-2); line-height: 1.8; }
+  .role-body strong { color: var(--text); }
+
+  .rule {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--text-2);
+  }
+  .rule strong { color: var(--text); }
+
+  /* Loop arrow */
+  .loop-indicator {
+    background: var(--orange-bg);
+    border: 1px dashed var(--orange-border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--orange);
+    font-weight: 600;
+    text-align: center;
+    max-width: 520px;
+  }
+
+  @media (max-width: 700px) {
+    .container { padding: 16px 14px 60px; }
+    .header h1 { font-size: 22px; }
+    .tabs { overflow-x: auto; }
+    .tab { white-space: nowrap; padding: 10px 14px; font-size: 13px; }
+    .flow-branches { grid-template-columns: 1fr; }
+    .header .meta { flex-direction: column; gap: 4px; }
+  }
+
+  @media print {
+    .tabs { display: none; }
+    .tab-content { display: block !important; page-break-inside: avoid; margin-bottom: 32px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="org">Arena Billiard — Internal SOP</div>
+    <h1>Quy Trình QC Tính Năng Sản Phẩm</h1>
+    <p>Testcase-driven — Mỗi User Story phải có testcase, pass 100% mới Done, bug phải có ticket</p>
+    <div class="meta">
+      <span>Version 1.0</span>
+      <span>Cập nhật: 14/04/2026</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(0)">Tổng Quan Quy Trình</button>
+    <button class="tab" onclick="switchTab(1)">Flow Chi Tiết</button>
+    <button class="tab" onclick="switchTab(2)">Vai Trò & Nguyên Tắc</button>
+  </div>
+
+  <!-- ====== TAB 0: TỔNG QUAN ====== -->
+  <div class="tab-content active" id="tab-0">
+    <div class="section">
+      <div class="section-head">
+        <h2>5 giai đoạn QC tính năng</h2>
+        <p>Mỗi tính năng đi qua 5 giai đoạn — từ phân rã User Story đến xử lý bug phản hồi từ khách hàng.</p>
+      </div>
+
+      <div class="phase plan">
+        <div class="phase-top">
+          <span class="ptag">GĐ 1</span>
+          <h3>Lập kế hoạch — Phân rã & Định nghĩa Testcase</h3>
+        </div>
+        <ul>
+          <li><strong>Phân rã tính năng</strong> — Mỗi tính năng sản phẩm được chia thành các User Story (US) độc lập</li>
+          <li><strong>Testcase bắt buộc</strong> — Mỗi US phải có bộ testcase đi kèm trước khi Dev bắt đầu code</li>
+          <li><strong>Acceptance criteria rõ ràng</strong> — Mỗi US mô tả chính xác hành vi mong đợi, không mơ hồ</li>
+        </ul>
+        <div class="action-box">
+          <span class="icon">⚠️</span>
+          <span><strong>Quy tắc cứng:</strong> US không có testcase = Không được phát triển. Dev Leader phải bổ sung testcase trước khi Dev bắt đầu.</span>
+        </div>
+      </div>
+
+      <div class="phase dev">
+        <div class="phase-top">
+          <span class="ptag">GĐ 2</span>
+          <h3>Phát triển — Dev code & Self-test</h3>
+        </div>
+        <ul>
+          <li><strong>Code theo đúng scope</strong> — Dev thực hiện phát triển theo phạm vi và acceptance criteria của từng US</li>
+          <li><strong>Self-test bắt buộc</strong> — Sau khi code xong, Dev tự test qua toàn bộ testcase của US</li>
+          <li><strong>Không Done nếu chưa self-test</strong> — Dev phải xác nhận pass toàn bộ trước khi báo Done</li>
+        </ul>
+        <div class="action-box">
+          <span class="icon">💡</span>
+          <span><strong>Không có QA riêng → Dev chính là người chịu trách nhiệm chất lượng.</strong> Self-test phải nghiêm túc như QA test, không làm cho có.</span>
+        </div>
+      </div>
+
+      <div class="phase test">
+        <div class="phase-top">
+          <span class="ptag">GĐ 3</span>
+          <h3>Kiểm thử — Dev Leader / Tech Lead verify</h3>
+        </div>
+        <ul>
+          <li><strong>Dev Leader / Tech Lead verify</strong> — Kiểm tra lại các US quan trọng hoặc phức tạp theo testcase đã định nghĩa</li>
+          <li><strong>Pass 100% mới Done</strong> — Chỉ khi toàn bộ testcase pass thì US mới được chuyển trạng thái Done</li>
+          <li><strong>Fail → quay lại Dev</strong> — Còn bất kỳ testcase fail → US quay về Dev sửa và self-test lại</li>
+        </ul>
+        <div class="action-box">
+          <span class="icon">🔁</span>
+          <span><strong>Vì không có QA riêng:</strong> Dev chịu trách nhiệm chính về chất lượng. Dev Leader / Tech Lead đóng vai trò verify bổ sung để đảm bảo không bỏ sót.</span>
+        </div>
+      </div>
+
+      <div class="phase release">
+        <div class="phase-top">
+          <span class="ptag">GĐ 4</span>
+          <h3>Phát hành — Gom Beta & Giao khách hàng</h3>
+        </div>
+        <ul>
+          <li><strong>Gom US Done → bản Beta</strong> — Các US đã Done được gom vào bản Beta</li>
+          <li><strong>Operation chuyển giao</strong> — Operation nhận bản Beta và chuyển cho khách hàng sử dụng thử</li>
+          <li><strong>Hướng dẫn test</strong> — Hướng dẫn khách hàng kiểm tra các tính năng mới trong bản Beta</li>
+        </ul>
+        <div class="action-box">
+          <span class="icon">✅</span>
+          <span><strong>Tiêu chuẩn Beta:</strong> Chỉ những US đã pass 100% testcase mới được đưa vào bản Beta. Không có ngoại lệ.</span>
+        </div>
+      </div>
+
+      <div class="phase feedback">
+        <div class="phase-top">
+          <span class="ptag">GĐ 5</span>
+          <h3>Phản hồi — Ghi nhận bug & Lên ticket</h3>
+        </div>
+        <ul>
+          <li><strong>Ghi nhận bug</strong> — Mọi lỗi phát sinh trong quá trình khách hàng sử dụng Beta đều được ghi nhận</li>
+          <li><strong>Tạo Bug ticket</strong> — Tất cả bug bắt buộc phải tạo thành Bug ticket trên Jira Backlog</li>
+          <li><strong>Ưu tiên xử lý</strong> — Team phân tích, đánh giá mức độ ưu tiên, đưa vào kế hoạch phát triển tiếp theo</li>
+        </ul>
+        <div class="action-box">
+          <span class="icon">📌</span>
+          <span><strong>Không fix ngầm.</strong> Mọi bug đều phải có ticket trên Jira để theo dõi, truy vết và đánh giá. Bug ticket đi qua cùng quy trình: Dev → Self-test → Verify → Done.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>3 câu hỏi kiểm tra nhanh</h2>
+        <p>Dùng bộ câu hỏi này để xác định US có đủ điều kiện chuyển trạng thái hay không</p>
+      </div>
+      <div class="decision">
+        <span class="num">❶</span>
+        <span>US đã có <strong>bộ testcase</strong> đầy đủ chưa? → CHƯA = <span class="result fail">KHÔNG ĐƯỢC CODE</span> &nbsp;RỒI = Tiếp ❷</span>
+      </div>
+      <div class="decision">
+        <span class="num">❷</span>
+        <span>Dev đã <strong>self-test pass 100%</strong> testcase chưa? → CHƯA = <span class="result fail">CHƯA ĐƯỢC DONE</span> &nbsp;RỒI = Tiếp ❸</span>
+      </div>
+      <div class="decision">
+        <span class="num">❸</span>
+        <span>Dev Leader / Tech Lead đã <strong>verify</strong> (nếu US quan trọng)? → OK = <span class="result pass">DONE → GOM BETA</span></span>
+      </div>
+      <div class="hint">
+        💡 Nguyên tắc cốt lõi: <strong>Không có ngoại lệ.</strong> Dù deadline gấp, dù khách yêu cầu — US chưa pass 100% testcase thì không được Done, không được vào Beta.
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== TAB 1: FLOW CHI TIẾT ====== -->
+  <div class="tab-content" id="tab-1">
+    <div class="section">
+      <div class="section-head">
+        <h2>Luồng xử lý từ đầu đến cuối</h2>
+        <p>Từ phân rã tính năng → phát triển → kiểm thử → phát hành Beta → xử lý bug</p>
+      </div>
+      <div class="flow">
+        <div class="flow-node">
+          <span class="tag purple">B1</span>
+          <h4>Phân rã tính năng → User Story</h4>
+          <p>Dev Leader phân rã tính năng thành các User Story độc lập. Mỗi US có scope, mô tả, và acceptance criteria rõ ràng.</p>
+        </div>
+        <div class="flow-down"></div>
+        <span class="flow-label required">BẮT BUỘC</span>
+        <div class="flow-down"></div>
+        <div class="flow-node">
+          <span class="tag purple">B2</span>
+          <h4>Định nghĩa Testcase cho từng US</h4>
+          <p>Dev Leader tạo bộ testcase cho mỗi US: Happy path, Negative case, Edge case, Performance (nếu cần).<br><strong>US không có testcase = Không được phát triển.</strong></p>
+        </div>
+        <div class="flow-down"></div>
+        <div class="flow-node">
+          <span class="tag cyan">B3</span>
+          <h4>Dev phát triển theo US</h4>
+          <p>Dev code theo đúng scope và acceptance criteria của US. Không làm thừa, không làm thiếu so với định nghĩa.</p>
+        </div>
+        <div class="flow-down"></div>
+        <div class="flow-node">
+          <span class="tag cyan">B4</span>
+          <h4>Dev self-test theo toàn bộ testcase</h4>
+          <p>Dev tự kiểm tra 100% testcase. Ghi nhận kết quả pass/fail. Dev chịu trách nhiệm chính về chất lượng US của mình.</p>
+        </div>
+        <div class="flow-down"></div>
+        <div class="flow-node">
+          <span class="tag blue">B5</span>
+          <h4>Dev Leader / Tech Lead verify</h4>
+          <p>Dev Leader hoặc Tech Lead kiểm tra lại các US quan trọng hoặc phức tạp theo testcase. Đóng vai trò bù đắp cho việc không có QA riêng.</p>
+        </div>
+        <div class="flow-down"></div>
+        <div class="flow-node" style="text-align:center; background:var(--surface-2);">
+          <h4 style="color:var(--accent);">Pass toàn bộ testcase?</h4>
+        </div>
+        <div class="flow-down"></div>
+        <div class="flow-branches">
+          <div class="branch pass">
+            <h5>✓ PASS → Done</h5>
+            <p>100% testcase pass.<br>US chuyển trạng thái Done.<br>Sẵn sàng gom vào Beta.</p>
+          </div>
+          <div class="branch fail">
+            <h5>✗ FAIL → Quay lại Dev</h5>
+            <p>Còn testcase fail.<br>Quay lại B4: Dev fix → self-test.<br>Rồi verify lại.</p>
+          </div>
+        </div>
+        <div class="flow-down"></div>
+        <div class="flow-node">
+          <span class="tag green">B6</span>
+          <h4>Gom US Done → Bản Beta</h4>
+          <p>Các US đã Done được gom lại thành bản Beta. Chỉ US pass 100% mới được vào Beta.</p>
+        </div>
+        <div class="flow-down"></div>
+        <div class="flow-node">
+          <span class="tag green">B7</span>
+          <h4>Operation giao Beta cho khách hàng</h4>
+          <p>Operation nhận bản Beta, chuyển cho khách hàng sử dụng thử. Hướng dẫn test tính năng mới.</p>
+        </div>
+        <div class="flow-down"></div>
+        <div class="flow-node">
+          <span class="tag orange">B8</span>
+          <h4>Ghi nhận bug phát sinh</h4>
+          <p>Trong quá trình sử dụng Beta, mọi lỗi được ghi nhận đầy đủ: mô tả, bước tái hiện, mức độ, screenshot/video.</p>
+        </div>
+        <div class="flow-down"></div>
+        <span class="flow-label required">BẮT BUỘC</span>
+        <div class="flow-down"></div>
+        <div class="flow-node">
+          <span class="tag orange">B9</span>
+          <h4>Tạo Bug ticket trên Jira Backlog</h4>
+          <p>Tất cả bug phải được tạo thành Bug ticket trên Jira. Không fix ngầm — phải có ticket để theo dõi và truy vết.</p>
+        </div>
+        <div class="flow-down"></div>
+        <div class="flow-node">
+          <span class="tag orange">B10</span>
+          <h4>Ưu tiên xử lý → Sprint tiếp theo</h4>
+          <p>Team phân tích, đánh giá mức độ ưu tiên. Bug nghiêm trọng → hotfix ngay. Còn lại → đưa vào sprint kế tiếp.</p>
+        </div>
+        <div class="loop-indicator">🔄 Bug ticket đi qua cùng quy trình: Dev code → Self-test → Verify → Done → Beta</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Yêu cầu khi tạo Bug ticket</h2>
+        <p>Bug ticket thiếu thông tin = không debug được = chậm xử lý. Bắt buộc đầy đủ:</p>
+      </div>
+
+      <div style="display:grid; gap:10px;">
+        <div class="decision">
+          <span class="num" style="font-size:16px;">📝</span>
+          <span><strong>Mô tả lỗi</strong> — Lỗi gì, ở đâu, xảy ra khi nào. Không nói chung chung "bị lỗi".</span>
+        </div>
+        <div class="decision">
+          <span class="num" style="font-size:16px;">🔄</span>
+          <span><strong>Bước tái hiện</strong> — Từng bước 1, 2, 3... làm gì thì lỗi xuất hiện. Phải tái hiện được.</span>
+        </div>
+        <div class="decision">
+          <span class="num" style="font-size:16px;">📸</span>
+          <span><strong>Screenshot / Video</strong> — Chụp hoặc quay lại lỗi đang xảy ra. Bằng chứng trực quan.</span>
+        </div>
+        <div class="decision">
+          <span class="num" style="font-size:16px;">🎯</span>
+          <span><strong>Kết quả mong đợi vs thực tế</strong> — Đáng lẽ phải như thế nào, thực tế bị sai như thế nào.</span>
+        </div>
+        <div class="decision">
+          <span class="num" style="font-size:16px;">📊</span>
+          <span><strong>Mức độ nghiêm trọng</strong> — Critical / Major / Minor. Ảnh hưởng bao nhiêu người dùng.</span>
+        </div>
+        <div class="decision">
+          <span class="num" style="font-size:16px;">📱</span>
+          <span><strong>Môi trường</strong> — App/Web, thiết bị gì, OS version, club nào bị (nếu liên quan).</span>
+        </div>
+      </div>
+
+      <div class="hint warn" style="margin-top:16px;">
+        ⚠️ <strong>Thiếu thông tin = trả lại yêu cầu bổ sung.</strong> Người báo bug có trách nhiệm cung cấp đủ thông tin. Bug ticket thiếu info sẽ bị reject.
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== TAB 2: VAI TRÒ & NGUYÊN TẮC ====== -->
+  <div class="tab-content" id="tab-2">
+    <div class="section">
+      <div class="section-head">
+        <h2>Phân công vai trò</h2>
+        <p>Team gồm 4 vai trò. Dev chịu trách nhiệm test luôn — không có QA riêng.</p>
+      </div>
+
+      <div class="role">
+        <div class="role-header">
+          <h4>👤 Dev Leader</h4>
+          <span class="role-tag">PHỤ TRÁCH CHUNG</span>
+        </div>
+        <div class="role-body">
+          <strong>Phân rã tính năng:</strong> Chia tính năng thành các User Story, định nghĩa scope, acceptance criteria và testcase cho từng US.<br><br>
+          <strong>Kiểm soát chất lượng:</strong> Review kết quả test, đảm bảo US đạt 100% testcase trước khi chuyển Done. Quyết định US nào đủ điều kiện vào Beta.<br><br>
+          <strong>Verify khi cần:</strong> Trực tiếp verify các US quan trọng hoặc phức tạp. Cross-check kết quả self-test của Dev.<br><br>
+          <strong>Quản lý Bug:</strong> Review Bug ticket trên Jira, đánh giá ưu tiên, phân công và đưa vào kế hoạch sprint.
+        </div>
+      </div>
+
+      <div class="role">
+        <div class="role-header">
+          <h4>🛠 Tech Lead</h4>
+          <span class="role-tag">HỖ TRỢ KỸ THUẬT</span>
+        </div>
+        <div class="role-body">
+          <strong>Review code:</strong> Đảm bảo code quality, review PR trước khi merge. Phát hiện lỗi logic hoặc edge case mà Dev có thể bỏ sót.<br><br>
+          <strong>Verify US phức tạp:</strong> Hỗ trợ Dev Leader verify các US liên quan đến kiến trúc, performance, hoặc ảnh hưởng nhiều module.<br><br>
+          <strong>Hỗ trợ debug:</strong> Khi Dev gặp bug khó tái hiện hoặc root cause phức tạp → Tech Lead hỗ trợ phân tích.
+        </div>
+      </div>
+
+      <div class="role">
+        <div class="role-header">
+          <h4>💻 Developer</h4>
+          <span class="role-tag">PHÁT TRIỂN & TEST</span>
+        </div>
+        <div class="role-body">
+          <strong>Code theo scope:</strong> Phát triển đúng phạm vi và acceptance criteria của US. Không làm thừa, không làm thiếu.<br><br>
+          <strong>Self-test bắt buộc:</strong> Sau khi code xong, tự test qua 100% testcase của US. Ghi nhận kết quả pass/fail.<br><br>
+          <strong>Chịu trách nhiệm test:</strong> Dev là người chịu trách nhiệm chính về chất lượng US của mình. Self-test phải nghiêm túc như QA test — không làm cho có.<br><br>
+          <strong>Fix bug:</strong> Khi Dev Leader/Tech Lead báo fail hoặc nhận Bug ticket → fix và self-test lại trước khi chuyển verify.
+        </div>
+      </div>
+
+      <div class="role">
+        <div class="role-header">
+          <h4>💬 Operation</h4>
+          <span class="role-tag">PHÁT HÀNH & PHẢN HỒI</span>
+        </div>
+        <div class="role-body">
+          <strong>Nhận bản Beta:</strong> Tiếp nhận bản Beta từ team phát triển sau khi các US đã Done.<br><br>
+          <strong>Giao cho khách hàng:</strong> Chuyển bản Beta cho khách hàng sử dụng thử, hướng dẫn test tính năng mới.<br><br>
+          <strong>Ghi nhận bug:</strong> Thu thập bug phản hồi từ khách hàng, đảm bảo đầy đủ thông tin (mô tả, screenshot, bước tái hiện).<br><br>
+          <strong>Tạo Bug ticket:</strong> Mọi bug phải được tạo thành ticket trên Jira Backlog. Không report qua chat/call mà thiếu ticket.
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Nguyên tắc chung</h2>
+      </div>
+      <div class="rule"><strong style="color:var(--red)">✗</strong> &nbsp;US không có testcase = Không được phát triển. Không có ngoại lệ.</div>
+      <div class="rule"><strong style="color:var(--red)">✗</strong> &nbsp;Dev chưa self-test = Không được chuyển Done. Self-test phải nghiêm túc, không làm cho có.</div>
+      <div class="rule"><strong style="color:var(--red)">✗</strong> &nbsp;Còn testcase fail = Không được Done. Dù chỉ 1 case.</div>
+      <div class="rule"><strong style="color:var(--red)">✗</strong> &nbsp;Bug không có ticket = Không tồn tại. Không fix ngầm, không chat report.</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Testcase phải cover: Happy path + Negative + Edge case. Không chỉ test "trường hợp đẹp".</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Dev Leader / Tech Lead verify US quan trọng — bù đắp cho việc không có QA riêng.</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Bug lặp lại > 2 lần → ưu tiên fix tận gốc, không chấp nhận workaround mãi.</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Bug ticket từ Beta cũng đi qua cùng quy trình: Dev → Self-test → Verify → Done.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(i) {
+  document.querySelectorAll('.tab').forEach((t, j) => t.classList.toggle('active', j === i));
+  document.querySelectorAll('.tab-content').forEach((c, j) => c.classList.toggle('active', j === i));
+}
+</script>
+</body>
+</html>
