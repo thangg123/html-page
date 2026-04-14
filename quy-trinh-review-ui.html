@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quy Trình Review UI Tính Năng — Arena Billiard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f8f9fb;
+    --surface-2: #f1f3f7;
+    --surface-3: #e8ecf1;
+    --border: #e2e6ed;
+    --border-light: #eef0f4;
+    --text: #1a1f2e;
+    --text-2: #3d4560;
+    --text-muted: #7a839b;
+    --accent: #2563eb;
+    --accent-light: #eff4ff;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --red-border: #fecaca;
+    --red-light: #fee2e2;
+    --orange: #d97706;
+    --orange-bg: #fffbeb;
+    --orange-border: #fde68a;
+    --orange-light: #fef3c7;
+    --green: #16a34a;
+    --green-bg: #f0fdf4;
+    --green-border: #bbf7d0;
+    --green-light: #dcfce7;
+    --purple: #7c3aed;
+    --purple-bg: #f5f3ff;
+    --purple-border: #c4b5fd;
+    --purple-light: #ede9fe;
+    --cyan: #0891b2;
+    --cyan-bg: #ecfeff;
+    --cyan-border: #a5f3fc;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  /* ═══ HEADER ═══ */
+  .header {
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .header .org {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+  }
+
+  .header p { color: var(--text-muted); font-size: 15px; }
+
+  .header .meta {
+    margin-top: 16px;
+    display: flex;
+    gap: 24px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+  }
+
+  /* ═══ TABS ═══ */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 32px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .tab {
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+  }
+
+  .tab:hover { color: var(--text-2); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ═══ SECTIONS ═══ */
+  .section { margin-bottom: 28px; }
+
+  .section-head { margin-bottom: 20px; }
+  .section-head h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .section-head p { font-size: 13px; color: var(--text-muted); }
+
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  /* ═══ PHASE CARDS ═══ */
+  .phase {
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 14px;
+    border-left: 4px solid;
+  }
+
+  .phase.plan { background: var(--purple-bg); border: 1px solid var(--purple-border); border-left: 4px solid var(--purple); }
+  .phase.dev { background: var(--cyan-bg); border: 1px solid var(--cyan-border); border-left: 4px solid var(--cyan); }
+  .phase.test { background: var(--accent-light); border: 1px solid #bfdbfe; border-left: 4px solid var(--accent); }
+  .phase.release { background: var(--green-bg); border: 1px solid var(--green-border); border-left: 4px solid var(--green); }
+  .phase.feedback { background: var(--orange-bg); border: 1px solid var(--orange-border); border-left: 4px solid var(--orange); }
+
+  .phase-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .phase-top h3 { font-size: 15px; font-weight: 700; }
+
+  .phase ul { padding-left: 18px; margin-bottom: 14px; }
+  .phase li { font-size: 14px; color: var(--text-2); margin-bottom: 5px; line-height: 1.6; }
+  .phase li strong { color: var(--text); }
+
+  /* ═══ SHARED: Tags & Badges ═══ */
+  .ptag {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    color: #fff;
+  }
+
+  .phase.plan .ptag { background: var(--purple); }
+  .phase.dev .ptag { background: var(--cyan); }
+  .phase.test .ptag { background: var(--accent); }
+  .phase.release .ptag { background: var(--green); }
+  .phase.feedback .ptag { background: var(--orange); }
+
+  /* ═══ ACTION BOX ═══ */
+  .action-box {
+    background: rgba(255,255,255,0.6);
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text-2);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    line-height: 1.6;
+  }
+
+  .action-box .icon { flex-shrink: 0; }
+
+  /* ═══ DECISION CARDS ═══ */
+  .decision {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 14px;
+  }
+
+  .decision .num { font-family: var(--mono); font-weight: 600; color: var(--accent); flex-shrink: 0; min-width: 20px; }
+
+  .result {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .result.pass { background: var(--green-light); color: var(--green); }
+  .result.fail { background: var(--red-light); color: var(--red); }
+  .result.wait { background: var(--orange-light); color: var(--orange); }
+
+  /* ═══ HINT BOXES ═══ */
+  .hint {
+    background: var(--accent-light);
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  .hint.warn {
+    background: var(--red-bg);
+    border-color: var(--red-border);
+    color: var(--red);
+  }
+
+  .hint.ok {
+    background: var(--green-bg);
+    border-color: var(--green-border);
+    color: var(--green);
+  }
+
+  /* ═══ FLOW ═══ */
+  .flow { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 16px 0; }
+
+  .flow-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 24px;
+    width: 100%;
+    max-width: 520px;
+    position: relative;
+  }
+
+  .flow-node .tag {
+    position: absolute;
+    top: -9px; left: 20px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 1px 10px;
+    border-radius: 4px;
+  }
+
+  .flow-node .tag.purple { color: var(--purple); }
+  .flow-node .tag.cyan { color: var(--cyan); }
+  .flow-node .tag.blue { color: var(--accent); }
+  .flow-node .tag.green { color: var(--green); }
+  .flow-node .tag.orange { color: var(--orange); }
+  .flow-node .tag.red { color: var(--red); }
+
+  .flow-node h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .flow-node p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+  .flow-down { width: 1px; height: 24px; border-left: 2px dashed var(--border); }
+
+  .flow-branches { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 520px; }
+  .flow-branches.tri { grid-template-columns: 1fr 1fr 1fr; }
+
+  .branch { border-radius: 8px; padding: 16px; text-align: center; }
+  .branch h5 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .branch p { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+
+  .branch.pass { background: var(--green-bg); border: 1px solid var(--green-border); }
+  .branch.pass h5 { color: var(--green); }
+  .branch.fail { background: var(--red-bg); border: 1px solid var(--red-border); }
+  .branch.fail h5 { color: var(--red); }
+  .branch.br0 { background: var(--red-bg); border: 1px solid var(--red-border); }
+  .branch.br0 h5 { color: var(--red); }
+  .branch.br1 { background: var(--orange-bg); border: 1px solid var(--orange-border); }
+  .branch.br1 h5 { color: var(--orange); }
+  .branch.br2 { background: var(--green-bg); border: 1px solid var(--green-border); }
+  .branch.br2 h5 { color: var(--green); }
+
+  .flow-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 14px;
+    border-radius: 20px;
+    margin: -4px 0;
+    z-index: 1;
+    position: relative;
+  }
+
+  .flow-label.required { background: var(--red-light); color: var(--red); border: 1px solid var(--red-border); }
+  .flow-label.info { background: var(--accent-light); color: var(--accent); border: 1px solid #bfdbfe; }
+  .flow-label.ok { background: var(--green-light); color: var(--green); border: 1px solid var(--green-border); }
+
+  .loop-indicator {
+    background: var(--orange-bg);
+    border: 1px dashed var(--orange-border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--orange);
+    font-weight: 600;
+    text-align: center;
+    max-width: 520px;
+  }
+
+  /* ═══ ROLE CARDS ═══ */
+  .role {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 14px;
+  }
+
+  .role-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .role-header h4 { font-size: 15px; font-weight: 700; }
+
+  .role-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+
+  .role-body { font-size: 14px; color: var(--text-2); line-height: 1.8; }
+  .role-body strong { color: var(--text); }
+
+  /* ═══ RULES ═══ */
+  .rule {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--text-2);
+  }
+  .rule strong { color: var(--text); }
+
+  /* ═══ TABLE ═══ */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border-light); color: var(--text-2); }
+  tr:last-child td { border-bottom: none; }
+
+  /* ═══ RESPONSIVE ═══ */
+  @media (max-width: 700px) {
+    .container { padding: 16px 14px 60px; }
+    .header h1 { font-size: 22px; }
+    .tabs { overflow-x: auto; }
+    .tab { white-space: nowrap; padding: 10px 14px; font-size: 13px; }
+    .flow-branches { grid-template-columns: 1fr; }
+    .flow-branches.tri { grid-template-columns: 1fr; }
+    .header .meta { flex-direction: column; gap: 4px; }
+  }
+
+  @media print {
+    .tabs { display: none; }
+    .tab-content { display: block !important; page-break-inside: avoid; margin-bottom: 32px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="org">Arena Billiard — Internal SOP</div>
+    <h1>Quy Trình Review UI Tính Năng</h1>
+    <p>Đảm bảo UI được review sớm qua group feedback — Dev làm xong UI thì up lên, tiếp tục code bình thường, có feedback thì sửa.</p>
+    <div class="meta">
+      <span>Version 1.0</span>
+      <span>Cập nhật: 14/04/2026</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(0)">Tổng Quan</button>
+    <button class="tab" onclick="switchTab(1)">Flow Chi Tiết</button>
+    <button class="tab" onclick="switchTab(2)">Vai Trò & Nguyên Tắc</button>
+  </div>
+
+  <!-- ====== TAB 0: TỔNG QUAN ====== -->
+  <div class="tab-content active" id="tab-0">
+
+    <div class="section">
+      <div class="section-head">
+        <h2>📋 Tổng quan quy trình</h2>
+        <p>Áp dụng cho toàn bộ team dev — Các tính năng có flow UI</p>
+      </div>
+
+      <div class="phase plan">
+        <div class="phase-top">
+          <span class="ptag">BƯỚC 1</span>
+          <h3>Nhận Task & Làm UI</h3>
+        </div>
+        <ul>
+          <li><strong>Nhận task</strong> từ board (Jira/task management) — task có liên quan đến UI</li>
+          <li><strong>Triển khai UI</strong> theo yêu cầu tính năng, bám sát design/spec</li>
+        </ul>
+        <div class="action-box">
+          <span class="icon">🎯</span>
+          <span>Dev tập trung làm xong phần UI trước, đảm bảo flow hoạt động đúng</span>
+        </div>
+      </div>
+
+      <div class="phase dev">
+        <div class="phase-top">
+          <span class="ptag">BƯỚC 2</span>
+          <h3>Up UI lên Group</h3>
+        </div>
+        <ul>
+          <li><strong>Chụp hình</strong> hoặc <strong>quay video</strong> màn hình UI đã làm</li>
+          <li><strong>Gửi lên group</strong> để mọi người xem và cho feedback</li>
+          <li><strong>Tiếp tục code</strong> — Không cần chờ feedback, làm tiếp bình thường</li>
+        </ul>
+        <div class="action-box">
+          <span class="icon">📸</span>
+          <span>Làm xong UI → Chụp/quay → Gửi group → Làm tiếp</span>
+        </div>
+      </div>
+
+      <div class="phase feedback">
+        <div class="phase-top">
+          <span class="ptag">BƯỚC 3</span>
+          <h3>Xử Lý Feedback</h3>
+        </div>
+        <ul>
+          <li><strong>Có feedback</strong> → Xem xét, thống nhất với team → Sửa lại UI theo feedback</li>
+          <li><strong>Không có feedback</strong> → Tiếp tục hoàn thành tính năng bình thường</li>
+        </ul>
+        <div class="action-box">
+          <span class="icon">🔄</span>
+          <span>Feedback được thống nhất → Sửa. Không có feedback → Tiếp tục code</span>
+        </div>
+      </div>
+
+      <div class="hint ok">
+        💡 Mục đích: Phát hiện sai sót UI sớm, tránh phải sửa lại nhiều khi tính năng đã hoàn thành. Dev không bị block — up xong là làm tiếp.
+      </div>
+    </div>
+
+    <!-- Quick Decision -->
+    <div class="section">
+      <div class="section-head">
+        <h2>⚡ Khi nào cần up UI?</h2>
+        <p>Câu hỏi nhanh để xác định</p>
+      </div>
+
+      <div class="decision">
+        <span class="num">Q1</span>
+        <div>
+          Task có liên quan đến UI/flow người dùng không?
+          <br><span class="result pass">CÓ → Áp dụng quy trình</span>
+          <span class="result fail">KHÔNG → Bỏ qua</span>
+        </div>
+      </div>
+
+      <div class="decision">
+        <span class="num">Q2</span>
+        <div>
+          UI đã hoàn thành đến mức có thể xem được flow chưa?
+          <br><span class="result pass">RỒI → Chụp/quay & gửi group</span>
+          <span class="result wait">CHƯA → Làm tiếp cho đến khi xem được</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ====== TAB 1: FLOW CHI TIẾT ====== -->
+  <div class="tab-content" id="tab-1">
+
+    <div class="section">
+      <div class="section-head">
+        <h2>🔄 Flow thực hiện</h2>
+        <p>Từ lúc nhận task đến khi hoàn thành</p>
+      </div>
+
+      <div class="flow">
+
+        <div class="flow-node">
+          <span class="tag purple">START</span>
+          <h4>Nhận task có UI</h4>
+          <p>Dev nhận task từ board. Xác định task có flow UI cần review.</p>
+        </div>
+
+        <div class="flow-down"></div>
+
+        <div class="flow-node">
+          <span class="tag cyan">DEV</span>
+          <h4>Triển khai UI</h4>
+          <p>Code giao diện theo yêu cầu tính năng. Đảm bảo flow UI hoạt động đúng logic.</p>
+        </div>
+
+        <div class="flow-down"></div>
+
+        <span class="flow-label required">BẮT BUỘC</span>
+
+        <div class="flow-down"></div>
+
+        <div class="flow-node">
+          <span class="tag blue">REVIEW</span>
+          <h4>Chụp hình / Quay video UI</h4>
+          <p>Chụp screenshot hoặc quay screen recording các màn hình UI đã làm xong. Đảm bảo thể hiện được flow người dùng.</p>
+        </div>
+
+        <div class="flow-down"></div>
+
+        <div class="flow-node">
+          <span class="tag blue">SHARE</span>
+          <h4>Gửi lên group</h4>
+          <p>Up hình/video lên group để team xem. Không cần chờ phản hồi — tiếp tục làm việc bình thường.</p>
+        </div>
+
+        <div class="flow-down"></div>
+
+        <div class="flow-node">
+          <span class="tag cyan">CONTINUE</span>
+          <h4>Tiếp tục code tính năng</h4>
+          <p>Không bị block bởi bước review. Dev tiếp tục hoàn thiện logic, API, integration...</p>
+        </div>
+
+        <div class="flow-down"></div>
+
+        <div class="flow-branches">
+          <div class="branch pass">
+            <h5>✅ Không có feedback</h5>
+            <p>Tiếp tục hoàn thành task bình thường</p>
+          </div>
+          <div class="branch br1">
+            <h5>💬 Có feedback</h5>
+            <p>Xem xét feedback → Thống nhất → Sửa UI</p>
+          </div>
+        </div>
+
+        <div class="flow-down"></div>
+
+        <div class="flow-node">
+          <span class="tag green">DONE</span>
+          <h4>Hoàn thành tính năng</h4>
+          <p>UI đã được review (nếu có feedback thì đã sửa). Tính năng sẵn sàng cho QA.</p>
+        </div>
+
+      </div>
+
+      <div class="hint">
+        ℹ️ Feedback chỉ cần sửa khi đã được <strong>thống nhất</strong> giữa các bên. Không phải mọi feedback đều phải thực hiện.
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ====== TAB 2: VAI TRÒ & NGUYÊN TẮC ====== -->
+  <div class="tab-content" id="tab-2">
+
+    <div class="section">
+      <div class="section-head">
+        <h2>👥 Vai trò</h2>
+        <p>Ai làm gì trong quy trình</p>
+      </div>
+
+      <div class="role">
+        <div class="role-header">
+          <h4>👨‍💻 Dev (Người thực hiện)</h4>
+          <span class="role-tag">THỰC HIỆN</span>
+        </div>
+        <div class="role-body">
+          <strong>Làm UI</strong> theo task được giao<br>
+          <strong>Chụp hình / quay video</strong> UI khi hoàn thành<br>
+          <strong>Gửi lên group</strong> để mọi người review<br>
+          <strong>Tiếp tục code</strong> — không chờ feedback<br>
+          <strong>Sửa UI</strong> nếu feedback được thống nhất
+        </div>
+      </div>
+
+      <div class="role">
+        <div class="role-header">
+          <h4>👥 Team Members (Người review)</h4>
+          <span class="role-tag">FEEDBACK</span>
+        </div>
+        <div class="role-body">
+          <strong>Xem UI</strong> được share trên group<br>
+          <strong>Cho feedback</strong> nếu phát hiện vấn đề hoặc có góp ý<br>
+          <strong>Thảo luận & thống nhất</strong> nếu có ý kiến khác nhau
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>📌 Nguyên tắc</h2>
+        <p>Những điều bắt buộc tuân thủ</p>
+      </div>
+
+      <div class="rule">
+        ✓ &nbsp;<strong>Bắt buộc chụp hình hoặc quay video</strong> — Không gửi text mô tả thay cho hình ảnh/video thực tế
+      </div>
+
+      <div class="rule">
+        ✓ &nbsp;<strong>Up ngay khi UI xong</strong> — Gửi lên group ngay khi UI đã hoạt động được, không đợi đến lúc hoàn thành toàn bộ tính năng
+      </div>
+
+      <div class="rule">
+        ✓ &nbsp;<strong>Không block công việc</strong> — Dev gửi xong thì tiếp tục code bình thường, không cần chờ ai review
+      </div>
+
+      <div class="rule">
+        ✓ &nbsp;<strong>Feedback phải được thống nhất</strong> — Chỉ sửa UI khi feedback đã được thống nhất, không sửa theo ý kiến cá nhân chưa đồng thuận
+      </div>
+
+      <div class="rule">
+        ✓ &nbsp;<strong>Áp dụng cho mọi task có UI</strong> — Bất kỳ tính năng nào có flow giao diện người dùng đều phải thực hiện quy trình này
+      </div>
+
+      <div class="hint warn">
+        ⚠️ Nếu skip bước up UI → Rủi ro phát hiện sai sót muộn, phải rework nhiều khi đã code xong logic.
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function switchTab(i) {
+  document.querySelectorAll('.tab').forEach((t, j) => t.classList.toggle('active', j === i));
+  document.querySelectorAll('.tab-content').forEach((c, j) => c.classList.toggle('active', j === i));
+}
+</script>
+</body>
+</html>
