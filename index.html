@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Danh sách tài liệu — Arena Billiard</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #ffffff;
@@ -17,8 +17,8 @@
     --text-muted: #7a839b;
     --accent: #2563eb;
     --accent-light: #eff4ff;
-    --font: 'IBM Plex Sans', -apple-system, sans-serif;
-    --mono: 'IBM Plex Mono', monospace;
+    --font: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -106,33 +106,47 @@
     margin-bottom: 20px;
   }
 
-  ul#list { list-style: none; display: grid; gap: 10px; }
+  ul#list {
+    list-style: none;
+    border-top: 1px solid var(--border);
+  }
+
+  ul#list li {
+    border-bottom: 1px solid var(--border-light);
+  }
 
   ul#list li a {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    padding: 18px 22px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    gap: 20px;
+    padding: 16px 8px;
     text-decoration: none;
     color: var(--text);
-    transition: background 150ms, border-color 150ms, transform 150ms;
+    transition: background 120ms, padding 150ms;
   }
 
   ul#list li a:hover {
     background: var(--accent-light);
-    border-color: var(--accent);
-    transform: translateX(2px);
+    padding-left: 16px;
+    padding-right: 16px;
   }
+
+  ul#list li a .idx {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    min-width: 32px;
+    letter-spacing: 0.5px;
+  }
+
+  ul#list li a .body { flex: 1; min-width: 0; }
 
   ul#list li a .name {
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text);
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     letter-spacing: -0.1px;
   }
 
@@ -140,20 +154,22 @@
     font-family: var(--mono);
     font-size: 12px;
     color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   ul#list li a:hover .name { color: var(--accent); }
 
   ul#list li a .arrow {
-    font-family: var(--mono);
-    font-size: 18px;
+    font-size: 16px;
     color: var(--text-muted);
-    transition: color 150ms, transform 150ms;
+    transition: color 120ms, transform 150ms;
   }
 
   ul#list li a:hover .arrow {
     color: var(--accent);
-    transform: translateX(4px);
+    transform: translateX(3px);
   }
 
   .empty {
@@ -203,35 +219,47 @@
 
   let rows = [];
 
-  function buildRow(item) {
+  function buildRow(item, index) {
     const li = document.createElement("li");
     const a = document.createElement("a");
     a.href = item.file;
-    const wrap = document.createElement("span");
+
+    const idx = document.createElement("span");
+    idx.className = "idx";
+    idx.textContent = String(index + 1).padStart(2, "0");
+
+    const body = document.createElement("div");
+    body.className = "body";
     const name = document.createElement("div");
     name.className = "name";
     name.textContent = item.title;
     const file = document.createElement("div");
     file.className = "file";
     file.textContent = item.file;
-    wrap.appendChild(name);
-    wrap.appendChild(file);
+    body.appendChild(name);
+    body.appendChild(file);
+
     const arrow = document.createElement("span");
     arrow.className = "arrow";
     arrow.textContent = "→";
-    a.appendChild(wrap);
+
+    a.appendChild(idx);
+    a.appendChild(body);
     a.appendChild(arrow);
     li.appendChild(a);
-    return { li, haystack: normalize(`${item.title} ${item.file}`) };
+    return { li, idxEl: idx, haystack: normalize(`${item.title} ${item.file}`) };
   }
 
   function filter() {
     const q = normalize(input.value.trim());
     let visible = 0;
-    rows.forEach(({ li, haystack }) => {
+    rows.forEach(({ li, idxEl, haystack }) => {
       const show = !q || haystack.includes(q);
       li.hidden = !show;
-      if (show) visible++;
+      if (show) {
+        visible++;
+        idxEl.textContent = String(visible).padStart(2, "0");
+      }
     });
     visibleEl.textContent = visible;
     empty.hidden = visible !== 0;
