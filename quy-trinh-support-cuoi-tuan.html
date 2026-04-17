@@ -375,7 +375,7 @@
         </ul>
         <div class="action-box">
           <span class="icon">⚡</span>
-          <span><strong>Người xử lý: Thắng (Dev Leader)</strong> — Operation liên hệ trực tiếp cho Thắng ngay lập tức. Không chờ message. Thắng sẽ tự kéo Tech Leader vào hỗ trợ nếu cần.</span>
+          <span><strong>Người xử lý: Dev Trực</strong> — Operation gọi điện Dev Trực ngay lập tức. Dev Trực xử lý ngay (rollback, restart, fix). Nếu không xử lý được → liên hệ Dev Leader tự kéo Tech Leader nếu cần.</span>
         </div>
       </div>
 
@@ -393,7 +393,7 @@
         </ul>
         <div class="action-box">
           <span class="icon">💬</span>
-          <span><strong>Người xử lý: Thắng (Dev Leader)</strong> — Operation message group kèm mô tả + ảnh/video. Thắng đánh giá → hướng dẫn workaround hoặc fix tạm. Fix chính thức Thứ 2. Thắng sẽ tự kéo Tech Leader vào nếu cần hỗ trợ.</span>
+          <span><strong>Người xử lý: Dev Trực</strong> — Operation message group kèm mô tả + ảnh/video. Dev Trực đánh giá → workaround hoặc fix tạm. Nếu không xử lý được → liên hệ Dev Leader. Fix chính thức Thứ 2.</span>
         </div>
       </div>
 
@@ -420,7 +420,7 @@
     <div class="section">
       <div class="section-head">
         <h2>3 câu hỏi phân loại nhanh</h2>
-        <p>Thắng dùng bộ câu hỏi này để xác định mức ưu tiên khi nhận báo lỗi</p>
+        <p>Dev Trực dùng bộ câu hỏi này để xác định mức ưu tiên khi nhận báo lỗi</p>
       </div>
       <div class="decision">
         <span class="num">❶</span>
@@ -435,7 +435,7 @@
         <span>Còn lại → Dù có workaround hay không = <span class="result r2">P2</span> — tạo ticket, Thứ 2 xử lý</span>
       </div>
       <div class="hint">
-        💡 Operation chỉ cần nhớ: cửa hàng <strong>không hoạt động được</strong> → liên hệ Thắng. Còn lại → message group. Thắng tự đánh giá.
+        💡 Operation chỉ cần nhớ: liên hệ <strong>Dev Trực</strong>. Dev Trực tự xử lý hoặc escalate lên Dev Leader nếu không xử lý được.
       </div>
     </div>
   </div>
@@ -457,18 +457,18 @@
         <div class="flow-down"></div>
         <div class="flow-node">
           <span class="tag">B2</span>
-          <h4>Operation báo lỗi về Thắng</h4>
-          <p>Nếu cửa hàng không vận hành được → <strong>liên hệ Thắng ngay</strong>.<br>Còn lại → message group kèm đầy đủ thông tin. <strong>Thắng tự phân loại P0/P1/P2.</strong></p>
+          <h4>Operation báo lỗi về Dev Trực</h4>
+          <p>Operation gửi đầy đủ thông tin cho Dev Trực.<br>Cửa hàng không vận hành được → <strong>gọi điện Dev Trực ngay</strong>. Còn lại → message group.<br><strong>Dev Trực tự phân loại P0/P1/P2 và xử lý.</strong></p>
         </div>
         <div class="flow-down"></div>
         <div class="flow-branches">
           <div class="branch br0">
-            <h5>P0 → Liên hệ Thắng</h5>
-            <p>Liên hệ trực tiếp.<br>Thắng fix / rollback / restart.<br>Tự kéo Tech Leader nếu cần.</p>
+            <h5>P0 → Dev Trực xử lý</h5>
+            <p>Fix / rollback / restart ngay.<br>Không được → gọi Dev Leader.<br>Dev Leader kéo Tech Leader nếu cần.</p>
           </div>
           <div class="branch br1">
-            <h5>P1 → Nhắn Thắng</h5>
-            <p>Message group kèm detail.<br>Thắng đánh giá + workaround.<br>Fix chính Thứ 2.</p>
+            <h5>P1 → Dev Trực xử lý</h5>
+            <p>Đánh giá + workaround.<br>Không được → gọi Dev Leader.<br>Fix chính Thứ 2.</p>
           </div>
           <div class="branch br2">
             <h5>P2 → Tạo Ticket</h5>
@@ -524,7 +524,7 @@
       </div>
 
       <div class="hint" style="margin-top:16px;">
-        ⚠️ <strong>Thiếu thông tin = trả lại yêu cầu bổ sung.</strong> Operation có trách nhiệm hỏi lại cửa hàng cho đủ trước khi gửi về Thắng.
+        ⚠️ <strong>Thiếu thông tin = trả lại yêu cầu bổ sung.</strong> Operation có trách nhiệm hỏi lại cửa hàng cho đủ trước khi gửi về Dev Trực.
       </div>
     </div>
 
@@ -535,19 +535,32 @@
     <div class="section">
       <div class="section-head">
         <h2>Phân công vai trò cuối tuần</h2>
-        <p>Dev Leader (Thắng) phụ trách chính, tự quyết định kéo Tech Leader hoặc phân việc cho Dev Team khi cần.</p>
+        <p>Dev Trực xử lý toàn bộ lỗi cuối tuần. Không xử lý được → escalate lên Dev Leader → tự kéo Tech Leader nếu cần.</p>
       </div>
 
       <div class="role">
         <div class="role-header">
-          <h4>👤 Thắng — Dev Leader</h4>
-          <span class="role-tag">PHỤ TRÁCH CHÍNH</span>
+          <h4>💻 Dev Trực</h4>
+          <span class="role-tag">TUYẾN ĐẦU XỬ LÝ KỸ THUẬT</span>
         </div>
         <div class="role-body">
-          <strong>Phụ trách:</strong> Nhận báo lỗi → tự phân loại P0/P1/P2 → xử lý trực tiếp hoặc phân công Dev Team hỗ trợ.<br><br>
-          <strong>Quyền hạn:</strong> Toàn quyền xử lý kỹ thuật — rollback, hotfix, restart server, tắt/bật feature, quyết định business.<br><br>
+          <strong>Phụ trách:</strong> Nhận báo lỗi từ Operation → tự phân loại P0/P1/P2 → xử lý trực tiếp: debug, fix, restart service, apply workaround.<br><br>
+          <strong>Escalation:</strong> Nếu không xử lý được (lỗi cross-system, cần quyền server, vượt khả năng) → liên hệ Dev Leader ngay.<br><br>
+          <strong>Xoay ca:</strong> Luân phiên hàng tuần giữa các dev. Lịch trực công bố Thứ 6.<br><br>
+          <strong>Bù nghỉ:</strong> Dev trực cuối tuần → ghi nhận OT hoặc bù nghỉ trong tuần, rõ ràng không nợ.
+        </div>
+      </div>
+
+      <div class="role">
+        <div class="role-header">
+          <h4>👤 Dev Leader</h4>
+          <span class="role-tag">ESCALATION TỪ DEV TRỰC</span>
+        </div>
+        <div class="role-body">
+          <strong>Khi nào tham gia:</strong> Khi Dev Trực không xử lý được và liên hệ lên. Lỗi cross-system, cần quyền infrastructure, cần quyết định business (rollback feature, tắt tính năng, thông báo khách hàng).<br><br>
+          <strong>Quyền hạn:</strong> Toàn quyền — rollback, hotfix, restart server, tắt/bật feature, quyết định business, liên hệ khách hàng.<br><br>
           <strong>Escalation:</strong> Tự quyết định kéo Tech Leader vào khi cần.<br><br>
-          <strong>Sẵn sàng:</strong> Không cần ngồi máy cả ngày, nhưng ưu tiên mang theo laptop nếu mang được.<br><br>
+          <strong>Sẵn sàng:</strong> Không cần ngồi máy cả ngày, nhưng ưu tiên mang theo laptop nếu mang được. Phone luôn bật.<br><br>
           <strong>Chính sách:</strong> Dev Leader có chính sách riêng, không tính OT.
         </div>
       </div>
@@ -555,25 +568,13 @@
       <div class="role">
         <div class="role-header">
           <h4>🛠 Tech Leader</h4>
-          <span class="role-tag">HỖ TRỢ KHI ĐƯỢC KÉO VÀO</span>
+          <span class="role-tag">ESCALATION TỪ DEV LEADER</span>
         </div>
         <div class="role-body">
-          <strong>Khi nào tham gia:</strong> Chỉ khi Thắng chủ động kéo vào — lỗi phức tạp, ảnh hưởng rộng, hoặc cần chuyên môn sâu hơn.<br><br>
-          <strong>Quyền hạn:</strong> Hỗ trợ debug, fix tạm, restart service, phối hợp cùng Thắng.<br><br>
-          <strong>Sẵn sàng:</strong> Không cần trực, không cần check message định kỳ. Chỉ cần phone bật để sẵn sàng khi Thắng gọi, ưu tiên mang theo laptop nếu mang được.<br><br>
+          <strong>Khi nào tham gia:</strong> Chỉ khi Dev Leader chủ động kéo vào — lỗi phức tạp, ảnh hưởng rộng, hoặc cần chuyên môn sâu hơn.<br><br>
+          <strong>Quyền hạn:</strong> Hỗ trợ debug, fix tạm, restart service, phối hợp cùng Dev Leader.<br><br>
+          <strong>Sẵn sàng:</strong> Không cần trực, không cần check message. Chỉ cần phone bật để sẵn sàng khi Dev Leader gọi. Ưu tiên mang laptop nếu mang được.<br><br>
           <strong>Chính sách:</strong> Tech Leader có chính sách riêng, không tính OT.
-        </div>
-      </div>
-
-      <div class="role">
-        <div class="role-header">
-          <h4>💻 Dev Team</h4>
-          <span class="role-tag">HỖ TRỢ DEV LEADER</span>
-        </div>
-        <div class="role-body">
-          <strong>Khi nào tham gia:</strong> Khi Thắng phân công cụ thể — fix lỗi thuộc module mình phụ trách, hỗ trợ debug, hoặc apply workaround.<br><br>
-          <strong>Không cần làm:</strong> Không cần trực cuối tuần. Chỉ tham gia khi được Thắng gọi và giao việc rõ ràng.<br><br>
-          <strong>Bù nghỉ:</strong> Dev tham gia xử lý cuối tuần → ghi nhận OT hoặc bù nghỉ trong tuần, rõ ràng không nợ.
         </div>
       </div>
 
@@ -583,9 +584,31 @@
           <span class="role-tag">GHI NHẬN & BÁO LỖI</span>
         </div>
         <div class="role-body">
-          <strong>Nhiệm vụ:</strong> Tiếp nhận báo lỗi từ cửa hàng → Thu thập đầy đủ thông tin (hình ảnh/video, club nào, bảng điểm nào, giải nào, bước tái hiện, thời gian) → Gửi về Thắng.<br><br>
-          <strong>Cách gửi:</strong> Cửa hàng không vận hành được → <strong>liên hệ Thắng ngay</strong>. Còn lại → message group kèm đầy đủ thông tin.<br><br>
-          <strong>Trách nhiệm quan trọng:</strong> Thiếu thông tin = hỏi lại cửa hàng cho đủ trước khi gửi về Thắng. Không chuyển lỗi thiếu thông tin.
+          <strong>Nhiệm vụ:</strong> Tiếp nhận báo lỗi từ cửa hàng → Thu thập đầy đủ thông tin (hình ảnh/video, club nào, bảng điểm nào, giải nào, bước tái hiện, thời gian) → Gửi về Dev Trực.<br><br>
+          <strong>Cách gửi:</strong> Cửa hàng không vận hành được → <strong>gọi điện Dev Trực ngay</strong>. Còn lại → message group kèm đầy đủ thông tin.<br><br>
+          <strong>Trách nhiệm quan trọng:</strong> Thiếu thông tin = hỏi lại cửa hàng cho đủ trước khi gửi. Không chuyển lỗi thiếu thông tin.
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Chuỗi escalation</h2>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:0; flex-wrap:wrap; padding:20px 0;">
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 24px; text-align:center;">
+          <div style="font-weight:700; font-size:14px;">Dev Trực</div>
+          <div style="font-size:12px; color:var(--text-muted);">Xử lý trước</div>
+        </div>
+        <div style="padding:0 12px; color:var(--text-muted); font-size:18px;">→</div>
+        <div style="background:var(--orange-bg); border:1px solid var(--orange-border); border-radius:10px; padding:16px 24px; text-align:center;">
+          <div style="font-weight:700; font-size:14px; color:var(--orange);">Dev Leader</div>
+          <div style="font-size:12px; color:var(--text-muted);">Nếu không xử lý được</div>
+        </div>
+        <div style="padding:0 12px; color:var(--text-muted); font-size:18px;">→</div>
+        <div style="background:var(--red-bg); border:1px solid var(--red-border); border-radius:10px; padding:16px 24px; text-align:center;">
+          <div style="font-weight:700; font-size:14px; color:var(--red);">Tech Leader</div>
+          <div style="font-size:12px; color:var(--text-muted);">Dev Leader tự kéo vào</div>
         </div>
       </div>
     </div>
@@ -594,10 +617,11 @@
       <div class="section-head">
         <h2>Nguyên tắc chung</h2>
       </div>
-      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Thắng và Tech Lead ưu tiên mang laptop theo nếu mang được — không bắt buộc ngồi máy cả ngày.</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Dev Trực xoay ca công bằng, lịch trực công bố Thứ 6.</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Dev Trực tham gia xử lý cuối tuần → bù nghỉ hoặc OT rõ ràng.</div>
+      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Dev Leader và Tech Leader ưu tiên mang laptop nếu mang được — không bắt buộc ngồi máy cả ngày.</div>
       <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;P1 → workaround trước, fix chính Thứ 2. Không yêu cầu fix hoàn chỉnh cuối tuần.</div>
       <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;P2 = tuyệt đối không làm cuối tuần.</div>
-      <div class="rule"><strong style="color:var(--green)">✓</strong> &nbsp;Dev Team tham gia xử lý cuối tuần → bù nghỉ hoặc OT rõ ràng.</div>
     </div>
   </div>
 
