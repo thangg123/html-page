@@ -1,0 +1,2263 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#1a2245" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>Arena App — Home (Brand Blue)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* Brand — Arena blue. Primary everywhere. */
+    --brand: #0067e8;
+    --brand-bright: #2d85ff;
+    --brand-soft: #4a9dff;
+    --brand-deep: #003e8f;
+    --brand-glow: rgba(0, 103, 232, 0.4);
+
+    /* Dark base — bright navy, dark theme with breathing room */
+    --bg: #1a2245;
+    --bg-alt: #222b56;
+    --card: #2b3564;
+    --card-hi: #374278;
+
+    --line: rgba(255, 255, 255, 0.1);
+    --line-hi: rgba(45, 133, 255, 0.32);
+    --line-bright: rgba(45, 133, 255, 0.6);
+
+    /* Accents — used sparingly, purposefully */
+    --gold: #f5b544;          /* REWARDS only — voucher, mission reward */
+    --red: #e63946;            /* LIVE / urgency only */
+    --green: #4ade80;          /* Success / open / win only */
+    --chalk: #e8ddc8;          /* Warm text on accent backgrounds */
+
+    --text: #f4f5fb;
+    --text-dim: #b4b8d0;
+    --text-mute: #6a7092;
+
+    --r-sm: 10px;
+    --r-md: 16px;
+    --r-lg: 22px;
+    --r-xl: 28px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    color: var(--text);
+    background: #1a2245;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ============ PAGE BACKDROP ============ */
+  .page {
+    min-height: 100vh;
+    padding: 40px 20px 60px;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(ellipse at 15% 10%, rgba(45, 133, 255, 0.28), transparent 55%),
+      radial-gradient(ellipse at 85% 90%, rgba(0, 103, 232, 0.18), transparent 55%),
+      radial-gradient(ellipse at 50% 50%, #232c5a 0%, #182045 100%);
+    position: relative;
+  }
+  .page::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+
+  /* ============ PHONE FRAME ============ */
+  .phone {
+    flex: 0 0 auto;
+    width: 390px;
+    height: 844px;
+    background: #000;
+    border-radius: 54px;
+    padding: 12px;
+    box-shadow:
+      0 0 0 2px #303a68,
+      0 0 0 12px #1a2245,
+      0 60px 120px -20px rgba(10, 15, 35, 0.85),
+      0 0 120px -20px rgba(45, 133, 255, 0.45);
+    position: relative;
+    z-index: 2;
+  }
+  .notch {
+    position: absolute;
+    top: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 34px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 10;
+  }
+  .screen {
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(ellipse 100% 40% at 50% 0%, rgba(45, 133, 255, 0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 30% at 50% 100%, rgba(0, 103, 232, 0.08) 0%, transparent 60%),
+      var(--bg);
+    border-radius: 42px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+    scrollbar-width: none;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* ============ STATUS BAR ============ */
+  .status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px 0;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    height: 54px;
+    color: var(--text);
+  }
+  .status-right { display: flex; gap: 6px; align-items: center; }
+  .battery {
+    width: 26px; height: 12px;
+    border: 1.5px solid var(--text);
+    border-radius: 3px;
+    position: relative;
+    padding: 1px;
+  }
+  .battery::after {
+    content: '';
+    position: absolute;
+    right: -3px; top: 2px;
+    width: 2px; height: 6px;
+    background: var(--text);
+    border-radius: 0 1px 1px 0;
+  }
+  .battery-fill {
+    width: 87%; height: 100%;
+    background: var(--text);
+    border-radius: 1px;
+  }
+
+  /* ============ HEADER ============ */
+  .header {
+    padding: 8px 20px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .loc-chip {
+    display: flex; align-items: center; gap: 6px;
+    padding: 10px 12px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .loc-chip:hover { background: var(--card-hi); border-color: var(--line-hi); }
+  .loc-chip .dot {
+    width: 7px; height: 7px;
+    background: radial-gradient(circle at 30% 30%, #8ec5ff, #0067e8 60%);
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(45, 133, 255, 0.6);
+    animation: glow 2.2s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 6px var(--brand-bright); }
+    50% { box-shadow: 0 0 14px var(--brand-bright); }
+  }
+  .loc-chip svg { width: 10px; height: 10px; opacity: 0.5; }
+  .search {
+    flex: 1;
+    position: relative;
+  }
+  .search input {
+    width: 100%;
+    padding: 11px 14px 11px 38px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .search input::placeholder { color: var(--text-mute); }
+  .search input:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px var(--brand-glow);
+  }
+  .search svg {
+    position: absolute;
+    left: 13px; top: 50%;
+    transform: translateY(-50%);
+    width: 16px; height: 16px;
+    color: var(--text-mute);
+  }
+  .bell {
+    width: 40px; height: 40px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .bell:hover { background: var(--card-hi); border-color: var(--line-hi); }
+  .bell svg { width: 18px; height: 18px; }
+  .bell .badge {
+    position: absolute;
+    top: -5px; right: -5px;
+    min-width: 18px; height: 18px;
+    padding: 0 5px;
+    background: linear-gradient(180deg, #ff7685 0%, #e63946 50%, #b01e2a 100%);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    border: 2px solid var(--bg);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 210, 215, 0.55),
+      0 2px 6px -1px rgba(230, 57, 70, 0.6),
+      0 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  }
+
+  /* ============ DAILY STREAK BANNER (warm accent strip) ============ */
+  .streak-bar {
+    margin: 16px 20px 20px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background:
+      radial-gradient(ellipse at 0% 0%, rgba(255, 154, 60, 0.35) 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 100%, rgba(230, 57, 70, 0.2) 0%, transparent 55%),
+      linear-gradient(135deg, rgba(73, 38, 20, 0.75) 0%, rgba(48, 28, 40, 0.8) 100%);
+    border: 1px solid rgba(255, 180, 100, 0.3);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 220, 180, 0.2),
+      0 4px 14px -4px rgba(230, 57, 70, 0.3),
+      0 6px 20px -6px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.2s;
+  }
+  .streak-bar:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255, 180, 100, 0.5);
+  }
+
+  .streak-left {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+    flex: 1;
+  }
+  .streak-flame {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    background: linear-gradient(145deg, rgba(255, 180, 100, 0.35) 0%, rgba(230, 57, 70, 0.2) 100%);
+    border: 1px solid rgba(255, 180, 100, 0.45);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 220, 180, 0.35),
+      0 0 14px -3px rgba(255, 154, 60, 0.55);
+  }
+  .streak-flame svg {
+    width: 22px;
+    height: 22px;
+    filter: drop-shadow(0 1px 3px rgba(230, 57, 70, 0.55));
+  }
+  .streak-text {
+    min-width: 0;
+    flex: 1;
+  }
+  .streak-days {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffe2b0;
+    letter-spacing: 0.2px;
+    line-height: 1.15;
+  }
+  .streak-num {
+    background: linear-gradient(180deg, #ffd480 0%, #ff9a3c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 16px;
+    font-weight: 800;
+  }
+  .streak-sub {
+    font-size: 10.5px;
+    color: rgba(255, 220, 180, 0.75);
+    font-weight: 500;
+    margin-top: 2px;
+    line-height: 1.2;
+  }
+  .streak-reward {
+    color: #ffd480;
+    font-weight: 700;
+  }
+  .streak-progress {
+    display: flex;
+    gap: 3px;
+    flex-shrink: 0;
+  }
+  .streak-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 180, 100, 0.2);
+    border: 1px solid rgba(255, 180, 100, 0.3);
+  }
+  .streak-dot.active {
+    background: linear-gradient(180deg, #ffd480 0%, #ff9a3c 100%);
+    border-color: rgba(255, 180, 100, 0.6);
+    box-shadow: 0 0 4px rgba(255, 154, 60, 0.7);
+  }
+
+  /* ============ HERO GREETING ============ */
+  .hero-text {
+    padding: 12px 20px 20px;
+    position: relative;
+  }
+  .hello {
+    font-size: 13px;
+    color: var(--brand-soft);
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hello::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--brand-soft);
+  }
+  .hero-h {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    color: var(--text);
+  }
+  .hero-h em {
+    font-style: normal;
+    font-weight: 700;
+    font-size: inherit;
+    color: var(--brand-bright);
+  }
+  .hero-sub {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  /* ============ FEATURED CLUB (HERO CARD) ============ */
+  .featured {
+    margin: 0 20px 28px;
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    position: relative;
+    background: var(--card);
+    border: 1.5px solid rgba(106, 179, 255, 0.55);
+    aspect-ratio: 16/17;
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.2),
+      inset 0 0 0 1px rgba(106, 179, 255, 0.15),
+      inset 0 0 40px rgba(45, 133, 255, 0.12),
+      0 24px 60px -20px rgba(0, 0, 0, 0.7),
+      0 4px 16px -4px rgba(45, 133, 255, 0.5),
+      0 0 60px -10px rgba(106, 179, 255, 0.35);
+  }
+  .featured-art {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 18%, rgba(74, 157, 255, 0.6) 0%, transparent 42%),
+      radial-gradient(ellipse at 30% 85%, rgba(0, 62, 143, 0.5) 0%, transparent 60%),
+      radial-gradient(ellipse at 75% 90%, rgba(45, 133, 255, 0.35) 0%, transparent 55%),
+      linear-gradient(180deg, #1a2560 0%, #15204f 50%, #1a2448 100%);
+  }
+  /* POOL TABLE — blue felt with specular highlight (lamp reflection) */
+  .table-illo {
+    position: absolute;
+    left: 50%; top: 55%;
+    transform: translateX(-50%) perspective(600px) rotateX(55deg);
+    width: 260px; height: 130px;
+    background:
+      radial-gradient(ellipse at 50% 20%, rgba(120, 180, 255, 0.35) 0%, transparent 45%),
+      linear-gradient(180deg, #2d85ff 0%, #0067e8 40%, #003e8f 100%);
+    border-radius: 8px;
+    box-shadow:
+      0 0 60px rgba(45, 133, 255, 0.55),
+      0 20px 40px rgba(0, 0, 0, 0.7),
+      inset 0 0 0 8px #0a0d20,
+      inset 0 0 0 10px #1a1f3a,
+      inset 0 0 40px rgba(74, 157, 255, 0.3);
+  }
+  .table-illo::before,
+  .table-illo::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    background: #000;
+    border-radius: 50%;
+  }
+  .table-illo::before { top: -7px; left: -7px; box-shadow: 120px 0 #000, 240px 0 #000; }
+  .table-illo::after { bottom: -7px; left: -7px; box-shadow: 120px 0 #000, 240px 0 #000; }
+
+  .ball {
+    position: absolute;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  }
+  .ball.red { background: radial-gradient(circle at 35% 30%, #ff6b6b, #c22020); }
+  .ball.yellow { background: radial-gradient(circle at 35% 30%, #ffe066, #d4a017); }
+  .ball.white { background: radial-gradient(circle at 35% 30%, #fff, #c9c0ad); }
+
+  /* LAMP — blue neon (LED modern club signature) */
+  .lamp {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 180px; height: 80px;
+    background:
+      radial-gradient(ellipse at 50% 100%, rgba(45, 133, 255, 0.95) 0%, rgba(0, 103, 232, 0.5) 30%, transparent 70%);
+    filter: blur(6px);
+  }
+  .lamp::after {
+    content: '';
+    position: absolute;
+    top: 4px; left: 50%;
+    transform: translateX(-50%);
+    width: 44px; height: 14px;
+    background: linear-gradient(180deg, #1a2040 0%, #080a18 100%);
+    border-radius: 0 0 20px 20px;
+    filter: none;
+  }
+  .lamp::before {
+    content: '';
+    position: absolute;
+    top: 16px; left: 50%;
+    transform: translateX(-50%);
+    width: 32px; height: 3px;
+    background: var(--brand-bright);
+    border-radius: 2px;
+    box-shadow: 0 0 12px var(--brand-bright);
+    filter: none;
+  }
+
+  .featured-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(34, 46, 98, 0.82) 65%, rgba(38, 52, 108, 0.96) 100%);
+    z-index: 2;
+  }
+
+  .featured-content {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    padding: 16px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .f-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: var(--red);
+    color: white;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .live-pill .pulse {
+    width: 6px; height: 6px;
+    background: white;
+    border-radius: 50%;
+    animation: pulse 1.6s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.4); }
+  }
+
+  .f-badge {
+    background: linear-gradient(180deg, rgba(255, 210, 120, 0.22), rgba(245, 181, 68, 0.15));
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(245, 181, 68, 0.45);
+    color: #ffd480;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .f-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.8px;
+    margin-bottom: 8px;
+  }
+  .f-meta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .f-meta .sep { width: 3px; height: 3px; background: var(--text-mute); border-radius: 50%; }
+  .f-meta strong { color: var(--brand-bright); font-weight: 700; }
+
+  .f-tags {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .f-tag {
+    padding: 5px 10px;
+    background: rgba(255, 255, 255, 0.09);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .f-tag.open {
+    color: #a0f0c0;
+    border-color: rgba(74, 222, 128, 0.55);
+    background: linear-gradient(180deg, rgba(120, 240, 170, 0.22), rgba(74, 222, 128, 0.12));
+  }
+  .f-tag.available {
+    color: #86efac;
+    border-color: rgba(74, 222, 128, 0.6);
+    background: linear-gradient(180deg, rgba(120, 240, 170, 0.3), rgba(74, 222, 128, 0.15));
+    font-weight: 700;
+  }
+  .f-tag.voucher {
+    color: #ffd480;
+    border-color: rgba(245, 181, 68, 0.6);
+    background: linear-gradient(180deg, rgba(255, 210, 120, 0.28), rgba(245, 181, 68, 0.14));
+    font-weight: 700;
+  }
+  .f-tag.urgency {
+    color: #ff8a95;
+    border-color: rgba(230, 57, 70, 0.6);
+    background: linear-gradient(180deg, rgba(255, 120, 130, 0.28), rgba(230, 57, 70, 0.12));
+    font-weight: 700;
+  }
+
+  .f-cta {
+    display: flex;
+    gap: 8px;
+  }
+  .btn {
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: linear-gradient(180deg, #3a90ff 0%, #0067e8 45%, #0054c2 100%);
+    color: white;
+    flex: 1;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+      0 1px 0 rgba(255, 255, 255, 0.1),
+      0 10px 28px -8px rgba(45, 133, 255, 0.6),
+      0 3px 8px -2px rgba(0, 62, 143, 0.5);
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 1px 0 rgba(0, 62, 143, 0.3);
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.2) 50%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .btn-primary:hover {
+    background: linear-gradient(180deg, #4a9dff 0%, #2d85ff 45%, #0067e8 100%);
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      0 14px 32px -8px rgba(45, 133, 255, 0.65),
+      0 4px 10px -2px rgba(0, 62, 143, 0.5);
+  }
+  .btn-primary:hover::after { opacity: 1; }
+
+  .btn-ghost {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(8px);
+    padding: 12px 16px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  .btn-ghost:hover { background: rgba(255, 255, 255, 0.16); border-color: rgba(255, 255, 255, 0.35); }
+
+  /* ============ SECTION HEADER ============ */
+  .section {
+    margin-bottom: 28px;
+  }
+  .section-h {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0 20px;
+    margin-bottom: 12px;
+  }
+  .section-h h2 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .section-h h2 em {
+    font-style: normal;
+    font-weight: 700;
+    color: var(--brand-bright);
+  }
+  .section-h .link {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight: 500;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .section-h .link:hover { color: var(--brand-bright); }
+
+  /* ============ HORIZONTAL STRIP ============ */
+  .strip {
+    display: flex;
+    gap: 12px;
+    padding: 0 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+  }
+  .strip::-webkit-scrollbar { display: none; }
+  .strip > * { scroll-snap-align: start; flex: 0 0 auto; }
+
+  /* ============ CLUB CARD (small, strip) ============ */
+  .club-card {
+    width: 180px;
+    background: linear-gradient(180deg, #3e4a85 0%, #2d3668 100%);
+    border: 1.5px solid rgba(106, 179, 255, 0.4);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.15),
+      0 10px 24px -10px rgba(0, 0, 0, 0.6),
+      0 2px 10px -2px rgba(45, 133, 255, 0.3);
+  }
+  .club-card:hover {
+    border-color: rgba(106, 179, 255, 0.65);
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.22),
+      0 16px 36px -10px rgba(0, 0, 0, 0.7),
+      0 4px 18px -2px rgba(45, 133, 255, 0.5);
+  }
+  .cc-img {
+    height: 120px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cc-img .live {
+    position: absolute;
+    top: 10px; left: 10px;
+    z-index: 2;
+    padding: 4px 8px;
+    background: var(--red);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .cc-img .live .pulse { width: 5px; height: 5px; background: white; border-radius: 50%; animation: pulse 1.6s infinite; }
+  .cc-fav {
+    position: absolute;
+    top: 10px; right: 10px;
+    z-index: 2;
+    width: 28px; height: 28px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  .cc-fav svg { width: 14px; height: 14px; }
+
+  .cc-body { padding: 12px; }
+  .cc-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .cc-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-dim); }
+  .cc-meta .rating { color: var(--gold); font-weight: 600; display: flex; align-items: center; gap: 2px; }
+  .cc-meta .rating svg { width: 10px; height: 10px; fill: var(--gold); }
+
+  /* Thumbnails use blue-tinted gradients to stay brand-consistent */
+  .thumb-1 { background: linear-gradient(135deg, #1a2d68 0%, #155ecc 50%, #2d85ff 100%); }
+  .thumb-2 { background: linear-gradient(135deg, #2a1a50 0%, #3f2575 50%, #6a3ab5 100%); }
+  .thumb-3 { background: linear-gradient(135deg, #12204a 0%, #1e3570 50%, #2a52a8 100%); }
+  .thumb-4 { background: linear-gradient(135deg, #25204a 0%, #3e3468 50%, #584a92 100%); }
+  .thumb-5 { background: linear-gradient(135deg, #153458 0%, #215578 50%, #2e7098 100%); }
+
+  .thumb-overlay {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 25%, rgba(45, 133, 255, 0.3), transparent 55%),
+      linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.5) 100%);
+  }
+  .thumb-table {
+    position: absolute;
+    left: 50%; bottom: 20px;
+    transform: translateX(-50%) perspective(200px) rotateX(55deg);
+    width: 90px; height: 40px;
+    background: linear-gradient(180deg, #0067e8, #003e8f);
+    border-radius: 3px;
+    box-shadow: 0 0 20px rgba(45, 133, 255, 0.45), inset 0 0 0 3px #0a0f24;
+  }
+
+  /* ============ LIVE STRIP ============ */
+  .live-card {
+    width: 220px;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    aspect-ratio: 16 / 11;
+    background: var(--card);
+    border: 1.5px solid rgba(106, 179, 255, 0.38);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.15),
+      0 10px 24px -10px rgba(0, 0, 0, 0.6),
+      0 2px 10px -2px rgba(45, 133, 255, 0.3);
+  }
+  .live-card .thumb {
+    position: absolute;
+    inset: 0;
+  }
+  .live-card .thumb-overlay {
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(45, 133, 255, 0.3), transparent 55%),
+      linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 100%);
+  }
+  .live-card .top-row {
+    position: absolute;
+    top: 10px; left: 10px; right: 10px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 2;
+  }
+  .viewers {
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(8px);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .viewers svg { width: 12px; height: 12px; }
+  .live-card .info {
+    position: absolute;
+    bottom: 10px; left: 10px; right: 10px;
+    z-index: 2;
+  }
+  .live-card .info .match {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    margin-bottom: 2px;
+  }
+  .live-card .info .club {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  /* ============ OFFER CARD ============ */
+  .offer-card {
+    width: 240px;
+    height: 300px;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    border: 1.5px solid rgba(106, 179, 255, 0.4);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.18),
+      0 12px 28px -10px rgba(0, 0, 0, 0.65),
+      0 2px 12px -2px rgba(45, 133, 255, 0.35);
+  }
+  .offer-card .bg {
+    position: absolute; inset: 0;
+  }
+  /* Blue-dominant gradients, each with a different accent to create rhythm */
+  .offer-1 .bg {
+    background:
+      radial-gradient(ellipse at 40% 25%, rgba(74, 157, 255, 0.75) 0%, transparent 45%),
+      linear-gradient(140deg, #1a2d68 0%, #1455b0 50%, #2d85ff 100%);
+  }
+  .offer-2 .bg {
+    background:
+      radial-gradient(ellipse at 60% 30%, rgba(245, 181, 68, 0.45) 0%, transparent 50%),
+      linear-gradient(140deg, #2a1a50 0%, #4e2f75 50%, #1455b0 110%);
+  }
+  .offer-3 .bg {
+    background:
+      radial-gradient(ellipse at 50% 25%, rgba(230, 57, 70, 0.3) 0%, transparent 45%),
+      linear-gradient(140deg, #15204a 0%, #253068 50%, #1455b0 100%);
+  }
+  .offer-card .overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 30%, rgba(0, 0, 0, 0.8) 100%);
+  }
+  .offer-card .chip {
+    position: absolute;
+    top: 14px; left: 14px;
+    z-index: 2;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .offer-card .chip-stack {
+    position: absolute;
+    top: 14px; left: 14px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+  }
+  .offer-card .chip-stack .chip { position: static; }
+  .chip-hot { background: var(--red); color: white; box-shadow: inset 0 1px 0 rgba(255,255,255,0.3); }
+  .chip-ai {
+    background: linear-gradient(180deg, #3a90ff, #0067e8);
+    color: white;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      0 2px 8px -1px rgba(0, 103, 232, 0.5);
+  }
+  .chip-new { background: var(--gold); color: #1a0f04; box-shadow: inset 0 1px 0 rgba(255,255,255,0.3); }
+
+  .offer-card .content {
+    position: absolute;
+    bottom: 14px; left: 14px; right: 14px;
+    z-index: 2;
+  }
+  .offer-card .title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.4px;
+    margin-bottom: 4px;
+  }
+  .offer-card .sub {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .offer-deco {
+    position: absolute;
+    font-size: 70px;
+    opacity: 0.18;
+    z-index: 1;
+  }
+
+  /* ============ CLIPS STRIP ============ */
+  .clip-card {
+    width: 140px;
+    cursor: pointer;
+  }
+  .clip-thumb {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9/16;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    margin-bottom: 8px;
+    border: 1.5px solid rgba(106, 179, 255, 0.32);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 10px 20px -8px rgba(0, 0, 0, 0.6),
+      0 2px 10px -2px rgba(45, 133, 255, 0.25);
+  }
+  .clip-thumb .ai-tag {
+    position: absolute;
+    top: 8px; left: 8px;
+    z-index: 2;
+    padding: 3px 7px;
+    background: linear-gradient(180deg, #3a90ff, #0067e8);
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-radius: 4px;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      0 2px 8px -1px rgba(0, 103, 232, 0.5);
+    text-shadow: 0 1px 0 rgba(0, 62, 143, 0.4);
+  }
+  .clip-thumb .play-ic {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    display: grid;
+    place-items: center;
+    z-index: 2;
+    transition: all 0.2s;
+  }
+  .clip-card:hover .play-ic {
+    background: var(--brand);
+    border-color: var(--brand-bright);
+    box-shadow: 0 0 20px var(--brand-glow);
+  }
+  .clip-thumb .play-ic svg { width: 14px; height: 14px; fill: white; margin-left: 2px; }
+
+  .clip-name { font-size: 13px; font-weight: 600; letter-spacing: -0.2px; margin-bottom: 2px; }
+  .clip-meta { font-size: 11px; color: var(--text-dim); }
+
+  /* ============ MISSION BANNER ============ */
+  .mission {
+    margin: 0 20px;
+    padding: 18px;
+    border-radius: var(--r-lg);
+    background:
+      radial-gradient(ellipse at 90% 20%, rgba(74, 157, 255, 0.55) 0%, transparent 55%),
+      linear-gradient(135deg, #3c4a85 0%, #2d3568 100%);
+    border: 1.5px solid rgba(106, 179, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.18),
+      inset 0 0 40px rgba(45, 133, 255, 0.1),
+      0 14px 32px -12px rgba(0, 0, 0, 0.6),
+      0 4px 16px -4px rgba(45, 133, 255, 0.4);
+  }
+  .mission::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--brand-bright), transparent);
+    opacity: 0.5;
+  }
+  .mission-icon {
+    position: absolute;
+    right: -20px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 110px;
+    opacity: 0.08;
+    line-height: 1;
+  }
+  .mission-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--brand-bright);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mission-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+  }
+  .mission-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+  .mission-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .progress-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 60%;
+    background: linear-gradient(180deg, #5aa5ff 0%, #2d85ff 40%, #0067e8 100%);
+    border-radius: 999px;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      0 0 12px rgba(45, 133, 255, 0.5);
+    position: relative;
+  }
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 1px; left: 4px; right: 4px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  }
+  .progress-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--brand-bright);
+  }
+  .mission-reward {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--chalk);
+  }
+  .mission-reward .gift {
+    width: 24px; height: 24px;
+    background: rgba(245, 181, 68, 0.15);
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+    color: var(--gold);
+  }
+  .mission-reward .gift svg { width: 12px; height: 12px; }
+
+  /* ============ PRO HUB (Tournaments + Ranking) ============ */
+  .pro-hub {
+    margin: 0 20px;
+    border-radius: var(--r-lg);
+    background: linear-gradient(180deg, #3e4a85 0%, #2d3668 100%);
+    border: 1.5px solid rgba(106, 179, 255, 0.4);
+    overflow: hidden;
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.15),
+      0 12px 28px -10px rgba(0, 0, 0, 0.6),
+      0 4px 14px -4px rgba(45, 133, 255, 0.35);
+  }
+  .pro-tab {
+    display: flex;
+    border-bottom: 1px solid var(--line);
+  }
+  .pro-tab-btn {
+    flex: 1;
+    padding: 14px;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+  }
+  .pro-tab-btn.active { color: var(--text); }
+  .pro-tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 20%; right: 20%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #2d85ff 20%, #4a9dff 50%, #2d85ff 80%, transparent);
+    border-radius: 2px 2px 0 0;
+    box-shadow: 0 0 8px rgba(45, 133, 255, 0.5);
+  }
+  .pro-content { padding: 16px; }
+
+  .tournament-item {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .tournament-item:last-child { border-bottom: none; }
+  .t-date {
+    width: 48px;
+    text-align: center;
+    padding: 8px 0;
+    background:
+      linear-gradient(180deg, rgba(74, 157, 255, 0.18) 0%, rgba(0, 103, 232, 0.08) 100%);
+    border: 1px solid rgba(45, 133, 255, 0.35);
+    border-radius: 10px;
+    flex-shrink: 0;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+  .t-date .day { font-family: 'Bricolage Grotesque', sans-serif; font-size: 18px; font-weight: 700; color: var(--brand-bright); line-height: 1; }
+  .t-date .mon { font-size: 10px; color: var(--brand-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; font-weight: 600; }
+  .t-info { flex: 1; min-width: 0; }
+  .t-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    letter-spacing: -0.2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .t-meta { font-size: 12px; color: var(--text-dim); }
+  .t-prize { font-size: 12px; font-weight: 700; color: var(--gold); flex-shrink: 0; }
+
+  /* ============ SHORTCUT GRID (2x4 tiles, icon-top label-bottom) ============ */
+  .shortcuts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 8px;
+    row-gap: 12px;
+    padding: 0 20px 28px;
+  }
+
+  /* ============ SHORTCUT TILES — clean liquid glass (Apple-style frosted) ============ */
+  .sc-tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 4px 12px;
+    min-width: 0;
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(106, 179, 255, 0.1) 0%, rgba(45, 88, 180, 0.06) 100%);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(174, 211, 255, 0.22);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 4px 12px -4px rgba(0, 0, 0, 0.3);
+  }
+
+  .sc-tile::before,
+  .sc-tile::after {
+    display: none;
+    content: none;
+  }
+
+  .sc-tile:hover {
+    background: linear-gradient(180deg, rgba(140, 200, 255, 0.14) 0%, rgba(60, 110, 200, 0.08) 100%);
+    border-color: rgba(174, 211, 255, 0.4);
+    transform: translateY(-2px);
+  }
+  .sc-tile:active { transform: translateY(0); }
+
+  .sc-tile.gold, .sc-tile.blue, .sc-tile.green, .sc-tile.red {
+    background: linear-gradient(180deg, rgba(106, 179, 255, 0.1) 0%, rgba(45, 88, 180, 0.06) 100%);
+  }
+
+  /* ICON BADGE — inner frosted glass panel (smaller, translucent, minimal) */
+  .sc-ico {
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    position: relative;
+    transition: background 0.2s, border-color 0.2s;
+    transform: none;
+    background: linear-gradient(180deg, rgba(174, 211, 255, 0.16) 0%, rgba(106, 179, 255, 0.08) 100%);
+    border: 1px solid rgba(174, 211, 255, 0.28);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+  .sc-ico::before,
+  .sc-ico::after {
+    display: none;
+    content: none;
+  }
+
+  .sc-ico svg {
+    width: 22px;
+    height: 22px;
+    stroke-width: 2;
+    color: #ffffff;
+    position: relative;
+    z-index: 1;
+    filter: none;
+  }
+
+  .sc-ico.gold,
+  .sc-ico.blue,
+  .sc-ico.green,
+  .sc-ico.red {
+    color: #ffffff;
+    background: linear-gradient(180deg, rgba(174, 211, 255, 0.16) 0%, rgba(106, 179, 255, 0.08) 100%);
+    border: 1px solid rgba(174, 211, 255, 0.28);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    filter: none;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+
+  /* ============ WARM ACCENT BADGES (on icon badge top-right corner) ============ */
+  .sc-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 5px;
+    border-radius: 9px;
+    display: grid;
+    place-items: center;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0;
+    color: #fff;
+    line-height: 1;
+    border: 1.5px solid var(--bg);
+    z-index: 2;
+    pointer-events: none;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .sc-badge-gold {
+    background: linear-gradient(180deg, #ffc76e 0%, #f5b544 50%, #d9951e 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 245, 200, 0.6),
+      0 2px 6px -1px rgba(245, 181, 68, 0.65),
+      0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+  .sc-badge-red {
+    background: linear-gradient(180deg, #ff7685 0%, #e63946 50%, #b01e2a 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 210, 215, 0.55),
+      0 2px 6px -1px rgba(230, 57, 70, 0.65),
+      0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Small pulsing dot (for live/new indicators, no text) */
+  .sc-dot {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ff8a95 0%, #e63946 60%, #a8101d 100%);
+    border: 1.5px solid var(--bg);
+    box-shadow:
+      0 0 0 2px rgba(230, 57, 70, 0.25),
+      0 2px 4px rgba(230, 57, 70, 0.5);
+    z-index: 2;
+    pointer-events: none;
+  }
+  .sc-dot-pulse::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(230, 57, 70, 0.5) 0%, transparent 65%);
+    animation: dotPulse 1.8s ease-out infinite;
+  }
+  @keyframes dotPulse {
+    0%   { transform: scale(0.8); opacity: 0.8; }
+    70%  { transform: scale(1.6); opacity: 0; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+
+  .sc-tile:hover .sc-ico {
+    background: linear-gradient(180deg, rgba(200, 225, 255, 0.22) 0%, rgba(140, 200, 255, 0.12) 100%);
+    border-color: rgba(174, 211, 255, 0.45);
+  }
+
+  .sc-txt {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    color: #ffffff;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.25;
+    white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ============ CURVED BOTTOM NAV (scoreboard style, center bump) ============ */
+  .nav-wrap {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    height: 94px;
+    z-index: 30;
+    pointer-events: none;
+  }
+  .nav-shape {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    width: 100%;
+    height: 94px;
+    pointer-events: auto;
+    filter:
+      drop-shadow(0 -2px 8px rgba(45, 133, 255, 0.25))
+      drop-shadow(0 -8px 24px rgba(0, 0, 0, 0.55));
+  }
+  .nav-items {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    pointer-events: none;
+  }
+  .nav-items > * { pointer-events: auto; }
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 4px;
+    cursor: pointer;
+    color: #a0acd0;
+    transition: color 0.2s;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+  .nav-item svg { width: 22px; height: 22px; stroke-width: 1.8; }
+  .nav-item.active { color: #6ab3ff; position: relative; font-weight: 700; }
+  .nav-item.active svg { stroke-width: 2.2; }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    width: 5px; height: 5px;
+    background: radial-gradient(circle at 30% 30%, #aed3ff, #2d85ff);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(106, 179, 255, 0.9);
+  }
+  .nav-spacer { flex: 0 0 74px; }
+
+  .nav-fab {
+    position: absolute;
+    left: 50%;
+    top: 16px;
+    transform: translateX(-50%);
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 25%, #6ab3ff 0%, #2d85ff 35%, #0067e8 70%, #0052c0 100%);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: transform 0.2s;
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+      0 0 0 3px rgba(45, 133, 255, 0.2),
+      0 0 0 6px rgba(45, 133, 255, 0.08),
+      0 8px 24px -4px rgba(45, 133, 255, 0.55),
+      0 3px 10px -2px rgba(0, 62, 143, 0.5);
+  }
+  .nav-fab::before {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18), transparent 55%);
+    pointer-events: none;
+  }
+  .nav-fab:hover { transform: translateX(-50%) scale(1.06); }
+  .nav-fab svg { width: 24px; height: 24px; color: white; position: relative; z-index: 1; filter: drop-shadow(0 1px 2px rgba(0, 40, 100, 0.5)); }
+
+  .nav-fab-label {
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: #6ab3ff;
+    white-space: nowrap;
+    pointer-events: none;
+    text-shadow: 0 0 8px rgba(0, 103, 232, 0.5);
+  }
+
+  /* ============ ANNOTATION PANEL ============ */
+  .notes {
+    flex: 0 0 380px;
+    max-width: 380px;
+    padding: 24px;
+    background: rgba(43, 53, 100, 0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    color: var(--text);
+    position: sticky;
+    top: 40px;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+  }
+  .notes::-webkit-scrollbar { width: 4px; }
+  .notes::-webkit-scrollbar-thumb { background: var(--line-hi); border-radius: 2px; }
+
+  .notes .eyebrow {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    color: var(--brand-bright);
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .notes h1 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.8px;
+    margin-bottom: 20px;
+    line-height: 1.15;
+  }
+  .notes h1 em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--brand-bright);
+  }
+  .note-block {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .note-block:last-child { border-bottom: none; }
+  .note-num {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--brand-bright);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .note-title {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+  }
+  .note-body {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-dim);
+  }
+  .note-body strong { color: var(--chalk); font-weight: 600; }
+  .note-body code {
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 12px;
+    background: rgba(0, 103, 232, 0.12);
+    color: var(--brand-bright);
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 103, 232, 0.2);
+  }
+
+  .palette {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .swatch {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .ratio {
+    margin-top: 10px;
+    display: flex;
+    height: 20px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .ratio > div { display: grid; place-items: center; color: white; letter-spacing: 0.5px; }
+
+  /* ============ MINI ACCENT TAGS — used sparingly across sections ============ */
+  .mini-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 7px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    border-radius: 999px;
+    line-height: 1;
+  }
+  .mini-tag.gold {
+    background: linear-gradient(180deg, rgba(255, 210, 120, 0.18), rgba(245, 181, 68, 0.12));
+    color: #ffd480;
+    border: 1px solid rgba(245, 181, 68, 0.4);
+  }
+  .mini-tag.gold-solid {
+    background: linear-gradient(180deg, #ffd480, #f5b544);
+    color: #3a2408;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 2px 6px -1px rgba(245, 181, 68, 0.4);
+  }
+  .mini-tag.green {
+    background: linear-gradient(180deg, rgba(120, 240, 170, 0.15), rgba(74, 222, 128, 0.1));
+    color: #7fd9a5;
+    border: 1px solid rgba(74, 222, 128, 0.35);
+  }
+  .mini-tag.green-solid {
+    background: linear-gradient(180deg, #86efac, #4ade80);
+    color: #0a3520;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 2px 6px -1px rgba(74, 222, 128, 0.4);
+  }
+  .mini-tag.red {
+    background: linear-gradient(180deg, rgba(255, 120, 130, 0.18), rgba(230, 57, 70, 0.12));
+    color: #ff8a95;
+    border: 1px solid rgba(230, 57, 70, 0.4);
+  }
+  .mini-tag.red-solid {
+    background: linear-gradient(180deg, #ff5a6b, #e63946);
+    color: white;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 6px -1px rgba(230, 57, 70, 0.5);
+  }
+
+  /* ============ RESPONSIVE — desktop shows phone frame, mobile fills fullscreen ============ */
+  @media (max-width: 900px) {
+    .page { padding: 20px 16px 40px; }
+  }
+
+  /* Mobile: remove phone chrome, screen becomes the viewport */
+  @media (max-width: 768px) {
+    html, body { overflow: hidden; height: 100%; }
+    .page {
+      min-height: 100dvh;
+      padding: 0;
+      display: block;
+      background: var(--bg);
+    }
+    .page::before { display: none; }
+
+    .phone {
+      width: 100vw;
+      height: 100dvh;
+      max-width: 100%;
+      border-radius: 0;
+      padding: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .notch { display: none; }
+
+    .screen {
+      width: 100vw;
+      height: 100dvh;
+      border-radius: 0;
+      padding-top: env(safe-area-inset-top, 0);
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+
+    /* Status bar on real device: hide the faux iOS status bar since real OS has its own */
+    .status { display: none; }
+
+    /* Pull nav-wrap edges to viewport edges, respect safe area */
+    .nav-wrap {
+      left: 8px;
+      right: 8px;
+      bottom: calc(8px + env(safe-area-inset-bottom, 0));
+    }
+  }
+
+  /* Reveal animation */
+  .section, .featured, .shortcuts {
+    animation: riseIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  }
+  .shortcuts { animation-delay: 0.05s; }
+  .featured { animation-delay: 0.15s; }
+  .section:nth-of-type(n) { animation-delay: calc(var(--i, 0) * 0.08s + 0.22s); }
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ============ PHONE ============ -->
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+
+      <!-- STATUS BAR -->
+      <div class="status">
+        <div>9:41</div>
+        <div class="status-right">
+          <svg width="16" height="10" viewBox="0 0 16 10" fill="currentColor"><rect x="0" y="7" width="3" height="3" rx="0.5"/><rect x="4" y="5" width="3" height="5" rx="0.5"/><rect x="8" y="3" width="3" height="7" rx="0.5"/><rect x="12" y="0" width="3" height="10" rx="0.5"/></svg>
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor"><path d="M7 10a1.25 1.25 0 1 0 0-2.5A1.25 1.25 0 0 0 7 10zm3.3-3.6a4.7 4.7 0 0 0-6.6 0l-1 -1a6.1 6.1 0 0 1 8.6 0l-1 1zm2.2-2.2a7.8 7.8 0 0 0-11 0l-1-1a9.2 9.2 0 0 1 13 0l-1 1z"/></svg>
+          <div class="battery"><div class="battery-fill"></div></div>
+        </div>
+      </div>
+
+      <!-- HEADER -->
+      <div class="header">
+        <div class="search">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+          <input placeholder="Tìm club, giải đấu, cơ thủ..." />
+        </div>
+        <div class="bell">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2a5 5 0 0 0-5 5v3l-2 3h14l-2-3V7a5 5 0 0 0-5-5zM8 16a2 2 0 0 0 4 0"/></svg>
+          <div class="badge">5</div>
+        </div>
+      </div>
+
+      <!-- DAILY STREAK BANNER (warm accent strip) -->
+      <div class="streak-bar">
+        <div class="streak-left">
+          <div class="streak-flame">
+            <svg viewBox="0 0 20 20" fill="none"><path d="M10 18c-3.5 0-6-2.5-6-5.5 0-1.8 1-3 2-4 .5 1 1.5 1.5 2 1.5-0.5-2 0.5-4 2-5.5 0.5 1.5 1 2 2 3 1.5 1.5 2.5 3 2.5 5 0 3-2.5 5.5-4.5 5.5z" fill="url(#flameGrad)"/><defs><linearGradient id="flameGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd480"/><stop offset="0.5" stop-color="#ff9a3c"/><stop offset="1" stop-color="#e63946"/></linearGradient></defs></svg>
+          </div>
+          <div class="streak-text">
+            <div class="streak-days"><span class="streak-num">7</span> ngày streak</div>
+            <div class="streak-sub">Chơi thêm hôm nay để nhận <span class="streak-reward">+50 điểm</span></div>
+          </div>
+        </div>
+        <div class="streak-progress">
+          <div class="streak-dot active"></div>
+          <div class="streak-dot active"></div>
+          <div class="streak-dot active"></div>
+          <div class="streak-dot active"></div>
+          <div class="streak-dot active"></div>
+          <div class="streak-dot active"></div>
+          <div class="streak-dot active"></div>
+        </div>
+      </div>
+
+      <!-- SHORTCUT GRID (2 rows x 4 items) -->
+      <div class="shortcuts">
+        <div class="sc-tile gold">
+          <div class="sc-ico gold">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 2h8v3a4 4 0 0 1-8 0V2z"/>
+              <path d="M3 3H1v1a2 2 0 0 0 2 2M11 3h2v1a2 2 0 0 1-2 2"/>
+              <path d="M5 9v2h4V9M3.5 12h7"/>
+            </svg>
+          </div>
+          <div class="sc-txt">Xếp hạng</div>
+        </div>
+
+        <div class="sc-tile gold">
+          <div class="sc-ico gold">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 2v7l4-2 4 2V2z"/>
+              <path d="M3 2h8"/>
+            </svg>
+          </div>
+          <div class="sc-txt">Giải đấu</div>
+        </div>
+
+        <div class="sc-tile blue">
+          <div class="sc-ico blue">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="7" cy="7" r="5.5"/>
+              <circle cx="7" cy="7" r="3"/>
+              <circle cx="7" cy="7" r="0.9" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="sc-txt">Nhiệm vụ</div>
+        </div>
+
+        <div class="sc-tile green">
+          <div class="sc-ico green">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1.5" y="4" width="11" height="7" rx="1"/>
+              <path d="M4 4V2.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V4M1.5 7.5h11"/>
+            </svg>
+          </div>
+          <div class="sc-txt">Voucher</div>
+        </div>
+
+        <div class="sc-tile red">
+          <div class="sc-ico red">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1.5" y="3.5" width="9" height="7" rx="1"/>
+              <path d="M10.5 5.5l2.5-1.5v6l-2.5-1.5z"/>
+              <circle cx="4" cy="6" r="0.7" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="sc-txt">Cắt cam</div>
+        </div>
+
+        <div class="sc-tile blue">
+          <div class="sc-ico blue">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1.5" y="2.5" width="11" height="8" rx="1"/>
+              <path d="M5.5 4.5v4l3.5-2z" fill="currentColor"/>
+              <path d="M3 12.5h8"/>
+            </svg>
+          </div>
+          <div class="sc-txt">Top series</div>
+        </div>
+
+        <div class="sc-tile red">
+          <div class="sc-ico red">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="7" cy="7" r="5.5"/>
+              <circle cx="7" cy="7" r="1.8" fill="currentColor"/>
+              <path d="M3.5 3.5a5 5 0 0 0 0 7M10.5 3.5a5 5 0 0 1 0 7"/>
+            </svg>
+          </div>
+          <div class="sc-txt">Livestream</div>
+        </div>
+
+        <div class="sc-tile green">
+          <div class="sc-ico green">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 6h10M2 10h10M7 1a5 5 0 0 0-5 5v1h10V6a5 5 0 0 0-5-5z"/>
+              <circle cx="7" cy="1.5" r="0.5" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="sc-txt">Thực đơn</div>
+        </div>
+      </div>
+
+      <!-- FEATURED CLUB -->
+      <div class="featured">
+        <div class="featured-art">
+          <div class="lamp"></div>
+          <div class="table-illo">
+            <div class="ball white" style="top: 40%; left: 20%;"></div>
+            <div class="ball red" style="top: 35%; left: 55%;"></div>
+            <div class="ball yellow" style="top: 55%; left: 70%;"></div>
+          </div>
+        </div>
+        <div class="featured-overlay"></div>
+        <div class="featured-content">
+          <div class="f-top">
+            <div class="live-pill"><span class="pulse"></span>LIVE · 3 BÀN</div>
+            <div class="f-badge">
+              <svg width="11" height="11" viewBox="0 0 10 10" fill="currentColor"><path d="M5 0l1.2 3.6H10L7 5.8 8.2 9.4 5 7.2 1.8 9.4 3 5.8 0 3.6h3.8z"/></svg>
+              Top pick
+            </div>
+          </div>
+
+          <div>
+            <div class="f-title">CLB Hoàng Sao</div>
+            <div class="f-meta">
+              <span>📍 1.2 km</span>
+              <span class="sep"></span>
+              <span><strong>4.8</strong> ★ · 128 review</span>
+              <span class="sep"></span>
+              <span>08:00 – 23:00</span>
+            </div>
+            <div class="f-tags">
+              <span class="f-tag open">● Đang mở</span>
+              <span class="f-tag available">✓ 3 bàn trống</span>
+              <span class="f-tag">35k/h</span>
+              <span class="f-tag voucher">Voucher −30%</span>
+              <span class="f-tag urgency">🔥 Đông khách</span>
+            </div>
+            <div class="f-cta">
+              <button class="btn btn-primary">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="10" height="9" rx="1"/><path d="M5 1v4M9 1v4M2 6h10"/></svg>
+                Đặt bàn ngay
+              </button>
+              <button class="btn btn-ghost">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 12s4-4.5 4-7a4 4 0 1 0-8 0c0 2.5 4 7 4 7z"/><circle cx="7" cy="5" r="1.3"/></svg>
+                Chỉ đường
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLUB STRIP -->
+      <section class="section" style="--i:1">
+        <div class="section-h">
+          <h2>Club <em>khác</em> gần bạn</h2>
+          <a href="#" class="link">Xem bản đồ →</a>
+        </div>
+        <div class="strip">
+          <div class="club-card">
+            <div class="cc-img thumb-1">
+              <div class="thumb-overlay"></div>
+              <div class="thumb-table"></div>
+              <div class="live"><span class="pulse"></span>LIVE 5</div>
+              <div class="cc-fav">
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 12s-5-3-5-7a3 3 0 0 1 5-2 3 3 0 0 1 5 2c0 4-5 7-5 7z"/></svg>
+              </div>
+            </div>
+            <div class="cc-body">
+              <div class="cc-name">Dragon King</div>
+              <div class="cc-meta">
+                <span>2.8 km</span>
+                <span class="rating"><svg viewBox="0 0 10 10"><path d="M5 0l1.2 3.6H10L7 5.8 8.2 9.4 5 7.2 1.8 9.4 3 5.8 0 3.6h3.8z"/></svg>4.5</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="club-card">
+            <div class="cc-img thumb-3">
+              <div class="thumb-overlay"></div>
+              <div class="thumb-table"></div>
+              <div class="cc-fav">
+                <svg viewBox="0 0 14 14" fill="var(--brand-bright)" stroke="var(--brand-bright)" stroke-width="1.5"><path d="M7 12s-5-3-5-7a3 3 0 0 1 5-2 3 3 0 0 1 5 2c0 4-5 7-5 7z"/></svg>
+              </div>
+            </div>
+            <div class="cc-body">
+              <div class="cc-name">86 Luxury <span class="mini-tag gold">★ VIP</span></div>
+              <div class="cc-meta">
+                <span>4.5 km</span>
+                <span class="rating"><svg viewBox="0 0 10 10"><path d="M5 0l1.2 3.6H10L7 5.8 8.2 9.4 5 7.2 1.8 9.4 3 5.8 0 3.6h3.8z"/></svg>4.3</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="club-card">
+            <div class="cc-img thumb-4">
+              <div class="thumb-overlay"></div>
+              <div class="thumb-table"></div>
+              <div class="live"><span class="pulse"></span>LIVE 3</div>
+              <div class="cc-fav">
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 12s-5-3-5-7a3 3 0 0 1 5-2 3 3 0 0 1 5 2c0 4-5 7-5 7z"/></svg>
+              </div>
+            </div>
+            <div class="cc-body">
+              <div class="cc-name">HK Billiard</div>
+              <div class="cc-meta">
+                <span>7.3 km</span>
+                <span class="rating"><svg viewBox="0 0 10 10"><path d="M5 0l1.2 3.6H10L7 5.8 8.2 9.4 5 7.2 1.8 9.4 3 5.8 0 3.6h3.8z"/></svg>4.6</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="club-card">
+            <div class="cc-img thumb-5">
+              <div class="thumb-overlay"></div>
+              <div class="thumb-table"></div>
+              <div class="cc-fav">
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 12s-5-3-5-7a3 3 0 0 1 5-2 3 3 0 0 1 5 2c0 4-5 7-5 7z"/></svg>
+              </div>
+            </div>
+            <div class="cc-body">
+              <div class="cc-name">Bida Ba Chiều <span class="mini-tag green">Mới mở</span></div>
+              <div class="cc-meta">
+                <span>6.1 km</span>
+                <span class="rating"><svg viewBox="0 0 10 10"><path d="M5 0l1.2 3.6H10L7 5.8 8.2 9.4 5 7.2 1.8 9.4 3 5.8 0 3.6h3.8z"/></svg>4.1</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- OFFERS -->
+      <section class="section" style="--i:2">
+        <div class="section-h">
+          <h2>Ưu đãi <em>hot</em></h2>
+          <a href="#" class="link">Tất cả →</a>
+        </div>
+        <div class="strip">
+          <div class="offer-card offer-1">
+            <div class="bg"></div>
+            <div class="overlay"></div>
+            <div class="offer-deco" style="right: 8px; top: 20px;">🎱</div>
+            <div class="chip chip-hot">HOT</div>
+            <div class="content">
+              <div class="title">Khai trương<br/>Hoàng Sao 2</div>
+              <div class="sub">Miễn phí 2h · 100 khách đầu</div>
+            </div>
+          </div>
+          <div class="offer-card offer-2">
+            <div class="bg"></div>
+            <div class="overlay"></div>
+            <div class="offer-deco" style="right: 10px; top: 24px;">📹</div>
+            <div class="chip-stack">
+              <div class="chip chip-ai">ARENA AI</div>
+              <div class="mini-tag green-solid">MIỄN PHÍ</div>
+            </div>
+            <div class="content">
+              <div class="title">Camera AI<br/>tự cắt clip</div>
+              <div class="sub">Highlight lưu tự động</div>
+            </div>
+          </div>
+          <div class="offer-card offer-3">
+            <div class="bg"></div>
+            <div class="overlay"></div>
+            <div class="offer-deco" style="right: 10px; top: 20px;">🏆</div>
+            <div class="chip-stack">
+              <div class="chip chip-new">MỚI</div>
+              <div class="mini-tag red-solid">⏱ Còn 5 ngày</div>
+            </div>
+            <div class="content">
+              <div class="title">BD Open #12<br/>28/04</div>
+              <div class="sub">64 cơ thủ · Giải 20 triệu</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LIVE -->
+      <section class="section" style="--i:3">
+        <div class="section-h">
+          <h2>
+            <span style="display:inline-flex; align-items:center; gap: 6px;">
+              <span style="width:8px; height:8px; background:var(--red); border-radius:50%; animation: pulse 1.6s infinite;"></span>
+              Đang <em>live</em>
+            </span>
+          </h2>
+          <a href="#" class="link">234 trận →</a>
+        </div>
+        <div class="strip">
+          <div class="live-card">
+            <div class="thumb thumb-1"></div>
+            <div class="thumb-overlay"></div>
+            <div class="thumb-table"></div>
+            <div class="top-row">
+              <div class="live-pill"><span class="pulse"></span>LIVE</div>
+              <div class="viewers">
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6s2-3.5 5-3.5S11 6 11 6s-2 3.5-5 3.5S1 6 1 6z"/><circle cx="6" cy="6" r="1.5"/></svg>
+                1.2K
+              </div>
+            </div>
+            <div class="info">
+              <div class="match">Hùng vs Quốc</div>
+              <div class="club">CLB Hoàng Sao · 9-ball</div>
+            </div>
+          </div>
+
+          <div class="live-card">
+            <div class="thumb thumb-3"></div>
+            <div class="thumb-overlay"></div>
+            <div class="thumb-table"></div>
+            <div class="top-row">
+              <div class="live-pill"><span class="pulse"></span>LIVE</div>
+              <div class="viewers">
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6s2-3.5 5-3.5S11 6 11 6s-2 3.5-5 3.5S1 6 1 6z"/><circle cx="6" cy="6" r="1.5"/></svg>
+                892
+              </div>
+            </div>
+            <div class="info">
+              <div class="match">Carom 3 băng</div>
+              <div class="club">Dragon King · Chung kết</div>
+            </div>
+          </div>
+
+          <div class="live-card">
+            <div class="thumb thumb-4"></div>
+            <div class="thumb-overlay"></div>
+            <div class="thumb-table"></div>
+            <div class="top-row">
+              <div class="live-pill"><span class="pulse"></span>LIVE</div>
+              <div class="viewers">
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 6s2-3.5 5-3.5S11 6 11 6s-2 3.5-5 3.5S1 6 1 6z"/><circle cx="6" cy="6" r="1.5"/></svg>
+                456
+              </div>
+            </div>
+            <div class="info">
+              <div class="match">10-ball quick</div>
+              <div class="club">HK Billiard · Bàn 4</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CLIPS -->
+      <section class="section" style="--i:4">
+        <div class="section-h">
+          <h2>Highlight <em>của bạn</em></h2>
+          <a href="#" class="link">Kho clip →</a>
+        </div>
+        <div class="strip">
+          <div class="clip-card">
+            <div class="clip-thumb thumb-1">
+              <div class="thumb-overlay"></div>
+              <div class="ai-tag">AI CẮT</div>
+              <div class="play-ic"><svg viewBox="0 0 10 10"><path d="M2 1v8l7-4z"/></svg></div>
+            </div>
+            <div class="clip-name">Combo 3 bi 🔥</div>
+            <div class="clip-meta">Hoàng Sao · Hôm qua</div>
+          </div>
+          <div class="clip-card">
+            <div class="clip-thumb thumb-3">
+              <div class="thumb-overlay"></div>
+              <div class="ai-tag">AI CẮT</div>
+              <div class="play-ic"><svg viewBox="0 0 10 10"><path d="M2 1v8l7-4z"/></svg></div>
+            </div>
+            <div class="clip-name">Break sạch bàn</div>
+            <div class="clip-meta">Dragon King · 20/04</div>
+          </div>
+          <div class="clip-card">
+            <div class="clip-thumb thumb-4">
+              <div class="thumb-overlay"></div>
+              <div class="ai-tag">AI CẮT</div>
+              <div class="play-ic"><svg viewBox="0 0 10 10"><path d="M2 1v8l7-4z"/></svg></div>
+            </div>
+            <div class="clip-name">Safety đẹp</div>
+            <div class="clip-meta">Hoàng Sao · 18/04</div>
+          </div>
+          <div class="clip-card">
+            <div class="clip-thumb thumb-5">
+              <div class="thumb-overlay"></div>
+              <div class="ai-tag">AI CẮT</div>
+              <div class="play-ic"><svg viewBox="0 0 10 10"><path d="M2 1v8l7-4z"/></svg></div>
+            </div>
+            <div class="clip-name">9-ball sạch</div>
+            <div class="clip-meta">HK Billiard · 15/04</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MISSION -->
+      <section class="section" style="--i:5">
+        <div class="section-h">
+          <h2>Nhiệm vụ <em>hôm nay</em></h2>
+          <a href="#" class="link">Tất cả →</a>
+        </div>
+        <div class="mission">
+          <div class="mission-icon">🎯</div>
+          <span class="mini-tag red-solid" style="position: absolute; top: 14px; right: 14px; z-index: 2;">⏱ Còn 4h</span>
+          <div class="mission-label">● Đang theo dõi</div>
+          <div class="mission-title">Pot 5 bi liên tiếp</div>
+          <div class="mission-sub">Camera AI tự xác nhận — chỉ cần chơi ở club có camera.</div>
+          <div class="mission-progress">
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+            <div class="progress-text">3/5</div>
+          </div>
+          <div class="mission-reward">
+            <div class="gift">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="10" height="7" rx="1"/><path d="M6 4v7M1 7h10M4 4s-1-2 0-3 2 1 2 3M8 4s1-2 0-3-2 1-2 3"/></svg>
+            </div>
+            Voucher 1h miễn phí + clip AI
+          </div>
+        </div>
+      </section>
+
+      <!-- PRO HUB -->
+      <section class="section" style="--i:6">
+        <div class="section-h">
+          <h2>Giải đấu & <em>Xếp hạng</em></h2>
+          <a href="#" class="link">Xem thêm →</a>
+        </div>
+        <div class="pro-hub">
+          <div class="pro-tab">
+            <button class="pro-tab-btn active">Giải đấu sắp tới</button>
+            <button class="pro-tab-btn">Xếp hạng #247</button>
+          </div>
+          <div class="pro-content">
+            <div class="tournament-item">
+              <div class="t-date"><div class="day">25</div><div class="mon">04</div></div>
+              <div class="t-info">
+                <div class="t-name">Hoàng Sao Weekly Cup <span class="mini-tag green" style="font-size:9px;">Mở ĐK</span></div>
+                <div class="t-meta">9-ball · 32 cơ thủ · 14:00</div>
+              </div>
+              <div class="t-prize">10tr</div>
+            </div>
+            <div class="tournament-item">
+              <div class="t-date"><div class="day">28</div><div class="mon">04</div></div>
+              <div class="t-info">
+                <div class="t-name">Bình Dương Open #12 <span class="mini-tag red" style="font-size:9px;">Sắp đầy</span></div>
+                <div class="t-meta">10-ball · 58/64 cơ thủ</div>
+              </div>
+              <div class="t-prize">20tr</div>
+            </div>
+            <div class="tournament-item">
+              <div class="t-date"><div class="day">01</div><div class="mon">05</div></div>
+              <div class="t-info">
+                <div class="t-name">HCM Championship <span class="mini-tag gold" style="font-size:9px;">👑 Major</span></div>
+                <div class="t-meta">Carom 3 băng · 128 cơ thủ</div>
+              </div>
+              <div class="t-prize">50tr</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div style="height: 120px;"></div>
+
+    </div>
+
+    <!-- BOTTOM NAV — scoreboard-style, FAB inside bar -->
+    <div class="nav-wrap">
+      <!-- Rounded bar with convex bump at center top cradling the FAB -->
+      <svg class="nav-shape" viewBox="0 0 366 94" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="navFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#0f2170" stop-opacity="1"/>
+            <stop offset="0.5" stop-color="#091852" stop-opacity="1"/>
+            <stop offset="1" stop-color="#050e36" stop-opacity="1"/>
+          </linearGradient>
+          <linearGradient id="navEdge" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#2d85ff" stop-opacity="0.2"/>
+            <stop offset="0.28" stop-color="#4a9dff" stop-opacity="0.6"/>
+            <stop offset="0.5" stop-color="#6ab3ff" stop-opacity="0.95"/>
+            <stop offset="0.72" stop-color="#4a9dff" stop-opacity="0.6"/>
+            <stop offset="1" stop-color="#2d85ff" stop-opacity="0.2"/>
+          </linearGradient>
+        </defs>
+        <!-- Bar: top corners radius 20, bottom corners radius 42 (match screen), bump peak y=0 — horizontal tangents for smooth transitions -->
+        <path d="M 20 30 Q 0 30 0 50 L 0 52 Q 0 94 42 94 L 324 94 Q 366 94 366 52 L 366 50 Q 366 30 346 30 L 250 30 C 225 30 225 0 183 0 C 141 0 141 30 116 30 Z"
+              fill="url(#navFill)"
+              stroke="url(#navEdge)"
+              stroke-width="1.2"/>
+      </svg>
+
+      <!-- Side tab items -->
+      <div class="nav-items">
+        <div class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1V10z"/></svg>
+          Trang chủ
+        </div>
+        <div class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Club
+        </div>
+        <div class="nav-spacer"></div>
+        <div class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>
+          Khám phá
+        </div>
+        <div class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+          Cá nhân
+        </div>
+      </div>
+
+      <!-- Circular FAB with QR icon, sits inside the center bump -->
+      <div class="nav-fab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+          <path d="M14 14h3v3h-3zM19 14h2M14 19v2M17 17h2v2M19 19v2M14 21h3"/>
+        </svg>
+      </div>
+      <div class="nav-fab-label">Quét mã</div>
+    </div>
+  </div>
+
+
+</div>
+
+<script>
+  document.querySelectorAll('.pro-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.parentElement.querySelectorAll('.pro-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
