@@ -14,5 +14,13 @@
   {
     "file": "arena-home.html",
     "title": "Arena App Home"
+  },
+  {
+    "file": "arena-billiard.html",
+    "title": "Arena Web Style"
+  },
+  {
+    "file": "arena-billiard-2.html",
+    "title": "Arena Web Style 2"
   }
 ]
