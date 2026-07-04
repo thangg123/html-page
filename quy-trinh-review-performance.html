@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quy Trình Review Performance — Arena Billiard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f3f5fa;
+    --card: #ffffff;
+    --surface: #f8f9fb;
+    --surface-2: #f1f3f7;
+    --border: #e2e6ed;
+    --border-light: #eef0f4;
+    --text: #16203a;
+    --text-2: #3d4560;
+    --text-muted: #7a839b;
+    --accent: #2563eb;
+    --accent-light: #eff4ff;
+    --navy: #0b1f3f;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --red-border: #fecaca;
+    --red-light: #fee2e2;
+    --orange: #d97706;
+    --orange-bg: #fffbeb;
+    --orange-border: #fde68a;
+    --orange-light: #fef3c7;
+    --green: #16a34a;
+    --green-bg: #f0fdf4;
+    --green-border: #bbf7d0;
+    --green-light: #dcfce7;
+    --purple: #7c3aed;
+    --purple-bg: #f5f3ff;
+    --purple-border: #c4b5fd;
+    --purple-light: #ede9fe;
+    --cyan: #0891b2;
+    --cyan-bg: #ecfeff;
+    --cyan-border: #a5f3fc;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+    --radius: 14px;
+    --shadow-sm: 0 1px 2px rgba(16,24,40,.05);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.75;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ═══ HEADER ═══ */
+  .hero {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 36px 24px 30px;
+  }
+
+  .hero-inner { max-width: 960px; margin: 0 auto; }
+
+  .hero .org {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .hero h1 {
+    font-size: 28px;
+    font-weight: 750;
+    letter-spacing: -0.3px;
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+
+  .hero .sub { color: var(--text-muted); font-size: 15px; }
+
+  .hero .meta {
+    margin-top: 14px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  /* ═══ STICKY TAB BAR ═══ */
+  .tabbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255,255,255,.94);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    transition: box-shadow .2s ease;
+  }
+
+  .tabbar.scrolled { box-shadow: 0 3px 14px rgba(16,24,40,.09); }
+
+  .tabs {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    gap: 6px;
+    padding: 10px 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    padding: 9px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: var(--font);
+    white-space: nowrap;
+    transition: background .15s, color .15s;
+  }
+
+  .tab:hover { background: var(--surface-2); color: var(--text-2); }
+  .tab.active { background: var(--accent-light); color: var(--accent); }
+  .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn .25s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  /* ═══ LAYOUT ═══ */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 28px 20px 90px;
+  }
+
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 26px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .section-head { margin-bottom: 20px; }
+
+  .section-head h2 {
+    font-size: 18px;
+    font-weight: 750;
+    color: var(--text);
+    padding-left: 12px;
+    border-left: 4px solid var(--accent);
+    line-height: 1.35;
+  }
+
+  .section-head p { font-size: 13.5px; color: var(--text-muted); margin-top: 6px; }
+
+  /* ═══ TABLES ═══ */
+  .table-wrap { border: 1px solid var(--border-light); border-radius: 10px; overflow: hidden; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+  th {
+    text-align: left;
+    padding: 11px 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+  }
+
+  td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-2);
+    vertical-align: top;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  td strong { color: var(--text); }
+
+  table.zebra tbody tr:nth-child(even) td { background: #fafbfe; }
+  tbody tr:hover td { background: var(--accent-light); }
+
+  .num { font-family: var(--mono); font-size: 13px; }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    white-space: nowrap;
+  }
+  .badge.green { background: var(--green-light); color: var(--green); }
+  .badge.blue { background: var(--accent-light); color: var(--accent); }
+  .badge.orange { background: var(--orange-light); color: var(--orange); }
+  .badge.red { background: var(--red-light); color: var(--red); }
+  .badge.purple { background: var(--purple-light); color: var(--purple); }
+
+  /* ═══ PHASE CARDS ═══ */
+  .phase {
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 14px;
+    border-left: 4px solid;
+  }
+
+  .phase.plan { background: var(--purple-bg); border: 1px solid var(--purple-border); border-left: 4px solid var(--purple); }
+  .phase.dev { background: var(--cyan-bg); border: 1px solid var(--cyan-border); border-left: 4px solid var(--cyan); }
+  .phase.test { background: var(--accent-light); border: 1px solid #bfdbfe; border-left: 4px solid var(--accent); }
+  .phase.release { background: var(--green-bg); border: 1px solid var(--green-border); border-left: 4px solid var(--green); }
+  .phase.feedback { background: var(--orange-bg); border: 1px solid var(--orange-border); border-left: 4px solid var(--orange); }
+
+  .phase-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 13px;
+    flex-wrap: wrap;
+  }
+
+  .phase-top h3 { font-size: 15.5px; font-weight: 700; }
+  .phase-top .sla { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+
+  .phase ul { padding-left: 18px; margin-bottom: 13px; }
+  .phase li { font-size: 14px; color: var(--text-2); margin-bottom: 6px; line-height: 1.65; }
+  .phase li strong { color: var(--text); }
+  .phase ul:last-child { margin-bottom: 0; }
+
+  .ptag {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 5px;
+    letter-spacing: 0.5px;
+    color: #fff;
+  }
+
+  .phase.plan .ptag { background: var(--purple); }
+  .phase.dev .ptag { background: var(--cyan); }
+  .phase.test .ptag { background: var(--accent); }
+  .phase.release .ptag { background: var(--green); }
+  .phase.feedback .ptag { background: var(--orange); }
+
+  /* ═══ LEVEL CARDS ═══ */
+  .level {
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 14px;
+    border-left: 4px solid;
+  }
+
+  .level.p0 { background: var(--red-bg); border: 1px solid var(--red-border); border-left: 4px solid var(--red); }
+  .level.p1 { background: var(--orange-bg); border: 1px solid var(--orange-border); border-left: 4px solid var(--orange); }
+
+  .level-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 13px;
+    flex-wrap: wrap;
+  }
+
+  .level-top h3 { font-size: 15.5px; font-weight: 700; }
+  .level-top .sla { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+
+  .level ul { padding-left: 18px; margin-bottom: 13px; }
+  .level li { font-size: 14px; color: var(--text-2); margin-bottom: 6px; line-height: 1.65; }
+  .level li strong { color: var(--text); }
+
+  .level.p0 .ptag { background: var(--red); }
+  .level.p1 .ptag { background: var(--orange); }
+
+  /* ═══ ACTION BOX ═══ */
+  .action-box {
+    background: rgba(255,255,255,.65);
+    border: 1px solid rgba(0,0,0,.06);
+    border-radius: 9px;
+    padding: 12px 16px;
+    font-size: 13.5px;
+    color: var(--text-2);
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+    line-height: 1.6;
+  }
+
+  .action-box .icon { flex-shrink: 0; }
+
+  /* ═══ HINT ═══ */
+  .hint {
+    background: var(--accent-light);
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 16px;
+    font-size: 13.5px;
+    color: var(--accent);
+    font-weight: 500;
+    line-height: 1.65;
+  }
+
+  .hint.ok {
+    background: var(--green-bg);
+    border-color: var(--green-border);
+    color: var(--green);
+  }
+
+  /* ═══ TIMELINE ═══ */
+  .timeline { position: relative; padding: 6px 0 0 62px; }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 21px;
+    top: 10px;
+    bottom: 90px;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .tstep {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+  }
+
+  .tnum {
+    position: absolute;
+    left: -62px;
+    top: 2px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    border: 3px solid var(--card);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .c-purple { background: var(--purple); }
+  .c-blue { background: var(--accent); }
+  .c-cyan { background: var(--cyan); }
+  .c-orange { background: var(--orange); }
+  .c-red { background: var(--red); }
+  .c-green { background: var(--green); }
+  .c-slate { background: #475569; }
+
+  .tstep-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .tstep-top h4 { font-size: 15px; font-weight: 700; }
+
+  .tday {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--text-muted);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px 9px;
+    white-space: nowrap;
+  }
+
+  .tstep p { font-size: 13.5px; color: var(--text-2); margin-top: 7px; line-height: 1.65; }
+
+  .tflag {
+    margin: -4px 0 18px;
+    background: var(--red-bg);
+    border: 1px dashed var(--red-border);
+    color: var(--red);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 9px 14px;
+    border-radius: 9px;
+    display: flex;
+    gap: 9px;
+    align-items: center;
+    letter-spacing: 0.3px;
+  }
+
+  .tflag.info {
+    background: var(--accent-light);
+    border-color: #bfdbfe;
+    color: var(--accent);
+  }
+
+  .tbranches {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .branch { border-radius: 10px; padding: 16px; text-align: center; }
+  .branch h5 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .branch p { font-size: 12.5px; color: var(--text-2); line-height: 1.55; }
+
+  .branch.pass { background: var(--green-bg); border: 1px solid var(--green-border); }
+  .branch.pass h5 { color: var(--green); }
+  .branch.fail { background: var(--red-bg); border: 1px solid var(--red-border); }
+  .branch.fail h5 { color: var(--red); }
+
+  /* ═══ ROLES ═══ */
+  .roles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .role {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+
+  .role-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .role-header h4 { font-size: 15px; font-weight: 700; }
+
+  .role-tag {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 3px 9px;
+    border-radius: 4px;
+    letter-spacing: 0.4px;
+  }
+
+  .role-body { font-size: 13.5px; color: var(--text-2); line-height: 1.7; }
+  .role-body strong { color: var(--text); }
+
+  /* ═══ RULES ═══ */
+  .rule {
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.65;
+    transition: border-color .15s;
+  }
+
+  .rule:hover { border-color: #c6cede; }
+  .rule strong { color: var(--text); }
+
+  .ric {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+
+  .ric.ok { background: var(--green-light); color: var(--green); }
+  .ric.no { background: var(--red-light); color: var(--red); }
+
+  /* ═══ RESPONSIVE ═══ */
+  @media (max-width: 700px) {
+    .hero { padding: 26px 16px 22px; }
+    .hero h1 { font-size: 22px; }
+    .hero .meta { flex-direction: column; gap: 4px; }
+    .container { padding: 18px 12px 60px; }
+    .section { padding: 20px 16px; }
+    .roles { grid-template-columns: 1fr; }
+    .tbranches { grid-template-columns: 1fr; }
+    .timeline { padding-left: 48px; }
+    .timeline::before { left: 16px; }
+    .tnum { left: -48px; width: 34px; height: 34px; font-size: 11px; }
+    .tday { margin-left: 0; }
+    .phase-top .sla, .level-top .sla { margin-left: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  @media print {
+    .tabbar { display: none; }
+    .tab-content { display: block !important; page-break-inside: avoid; margin-bottom: 32px; }
+    body { background: #fff; }
+    .section { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="org">Arena Billiard — Internal SOP</div>
+    <h1>Quy Trình Review Performance — Dev Team</h1>
+    <p class="sub">Đánh giá 360° mỗi 6 tháng: Kết quả công việc 50% · Quản lý trực tiếp 30% · Đánh giá chéo 20% — làm cơ sở xét tăng lương</p>
+    <div class="meta">
+      <span>Version 1.4</span>
+      <span>Cập nhật: 04/07/2026</span>
+      <span>Áp dụng: Dev Team (6 người)</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabbar" id="tabbar">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(0)">Tổng Quan</button>
+    <button class="tab" onclick="switchTab(1)">Flow Chi Tiết</button>
+    <button class="tab" onclick="switchTab(2)">Tiêu Chí &amp; Thang Điểm</button>
+    <button class="tab" onclick="switchTab(3)">Nguyên Tắc Chung</button>
+  </div>
+</nav>
+
+<main class="container">
+
+  <!-- ====== TAB 0: TỔNG QUAN ====== -->
+  <div class="tab-content active" id="tab-0">
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Chu kỳ review</h2>
+        <p>2 kỳ/năm, mỗi kỳ đánh giá 6 tháng làm việc. Toàn bộ quy trình chạy trong 2 tuần.</p>
+      </div>
+      <div class="table-wrap"><table class="zebra">
+        <thead><tr><th>Kỳ</th><th>Giai đoạn đánh giá</th><th>Thời gian chạy review</th><th>Áp dụng lương mới</th></tr></thead>
+        <tbody>
+        <tr><td><strong>Kỳ 1</strong></td><td>Tháng 1 → Tháng 6</td><td>2 tuần đầu tháng 7</td><td>Từ kỳ lương tháng 8</td></tr>
+        <tr><td><strong>Kỳ 2</strong></td><td>Tháng 7 → Tháng 12</td><td>2 tuần đầu tháng 1</td><td>Từ kỳ lương tháng 2</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>3 nguồn đánh giá</h2>
+        <p>Điểm tổng = Kết quả công việc × 50% + Quản lý trực tiếp × 30% + Đánh giá chéo × 20% (thang 5)</p>
+      </div>
+
+      <div class="phase test">
+        <div class="phase-top">
+          <span class="ptag">50%</span>
+          <h3>Kết quả công việc</h3>
+          <span class="sla">Số liệu từ hệ thống</span>
+        </div>
+        <ul>
+          <li><strong>OKR công ty &amp; KPI cá nhân (20%)</strong> — ưu tiên cao nhất. PIC: tăng trưởng sản phẩm phụ trách (user active, doanh thu, GP2) theo bảng Product Review. Non-PIC: 2–3 KPI cá nhân gắn vào sản phẩm tham gia, chốt từ đầu kỳ</li>
+          <li><strong>Story &amp; Point hoàn thành (15%)</strong> — tổng story + point từ tracker trong kỳ, quy đổi thang 5 theo trung vị team</li>
+          <li><strong>Chất lượng (15%)</strong> — bug production và rework phát sinh do lỗi của bản thân</li>
+        </ul>
+        <div class="action-box"><span class="icon">📊</span><span>Quản lý tổng hợp số liệu từ tracker (story/point), bug tracker và bảng Product Review theo quý — <strong>không chấm cảm tính</strong>.</span></div>
+      </div>
+
+      <div class="phase plan">
+        <div class="phase-top">
+          <span class="ptag">30%</span>
+          <h3>Quản lý trực tiếp đánh giá</h3>
+          <span class="sla">Chấm thang 1–5</span>
+        </div>
+        <ul>
+          <li><strong>Cùng bộ 6 tiêu chí có trọng số như peer review</strong> — Chất lượng công việc 25%; Tần suất làm việc, Teamwork, Chủ động hỗ trợ, Deadline, Thái độ &amp; trách nhiệm: mỗi tiêu chí 15%</li>
+          <li>Chấm dựa trên <strong>quan sát cả 6 tháng + bằng chứng cụ thể</strong>, có tham khảo self-review; điểm quản lý <strong>tách riêng</strong>, không gộp vào trung bình peer</li>
+        </ul>
+        <div class="action-box"><span class="icon">👤</span><span>Mỗi nhận xét quan trọng phải kèm <strong>ví dụ cụ thể</strong> (US nào, sự việc nào) — tránh nhận xét chung chung.</span></div>
+      </div>
+
+      <div class="phase dev">
+        <div class="phase-top">
+          <span class="ptag">20%</span>
+          <h3>Đánh giá chéo (Peer Review)</h3>
+          <span class="sla">Ẩn danh · thang 1–5</span>
+        </div>
+        <ul>
+          <li>Mỗi thành viên đánh giá <strong>tất cả người còn lại trong team</strong> (kể cả Dev Leader — điểm của Leader dùng tham khảo), hoàn toàn ẩn danh</li>
+          <li><strong>6 tiêu chí có trọng số:</strong> Chất lượng công việc 25% · Tần suất làm việc, Hợp tác teamwork, Chủ động hỗ trợ, Đảm bảo deadline, Thái độ &amp; trách nhiệm — mỗi tiêu chí 15%</li>
+          <li>Điểm peer = <strong>trung bình có trọng số</strong> từ những người chấm; tự đánh giá không tính; kèm nhận xét ngắn cho từng người</li>
+        </ul>
+        <div class="action-box"><span class="icon">🔒</span><span>Chỉ quản lý thấy dữ liệu gốc. Member chỉ nhận <strong>điểm trung bình + feedback đã tổng hợp</strong>, không biết ai chấm gì.</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Vai trò &amp; phân công</h2>
+      </div>
+
+      <div class="roles">
+        <div class="role">
+          <div class="role-header">
+            <h4>Quản lý trực tiếp</h4>
+            <span class="role-tag">CHỦ TRÌ</span>
+          </div>
+          <div class="role-body">
+            Thông báo kỳ review, tổng hợp số liệu kết quả công việc, chấm phần 30%, calibration điểm, <strong>trình đề xuất xếp loại + mức tăng lương lên BQT</strong>, họp 1-1 thông báo kết quả đã duyệt. Chỉ đề xuất — không tự quyết định lương.
+          </div>
+        </div>
+
+        <div class="role">
+          <div class="role-header">
+            <h4>Ban Quản Trị (BQT)</h4>
+            <span class="role-tag">QUYẾT ĐỊNH</span>
+          </div>
+          <div class="role-body">
+            Duyệt <strong>band lương thị trường 1 lần/năm</strong>. Họp phê duyệt kết quả review: xem xét đề xuất của quản lý, <strong>quyết định tăng/không tăng và mức tăng cụ thể</strong> theo ngân sách. Có quyền điều chỉnh mức đề xuất hoặc yêu cầu bổ sung bằng chứng. Trực tiếp đánh giá <strong>Dev Leader</strong> (tham khảo điểm peer của team).
+          </div>
+        </div>
+
+        <div class="role">
+          <div class="role-header">
+            <h4>Thành viên Dev Team</h4>
+            <span class="role-tag">6 NGƯỜI</span>
+          </div>
+          <div class="role-body">
+            Nộp <strong>self-review</strong> (tự đánh giá, tham khảo — không tính điểm), đánh giá chéo ẩn danh 5 người còn lại <strong>đúng deadline</strong>, tham gia buổi 1-1, có quyền phản hồi kết quả trong 7 ngày.
+          </div>
+        </div>
+
+        <div class="role">
+          <div class="role-header">
+            <h4>HR / Kế toán</h4>
+            <span class="role-tag">THỰC THI</span>
+          </div>
+          <div class="role-body">
+            Nhận kết quả <strong>đã được BQT phê duyệt</strong>, điều chỉnh lương từ kỳ lương kế tiếp, lưu hồ sơ review để đối chiếu các kỳ sau.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ====== TAB 1: FLOW CHI TIẾT ====== -->
+  <div class="tab-content" id="tab-1">
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Flow review — chốt KPI đầu kỳ + 7 bước trong 2 tuần</h2>
+        <p>KPI phải được chốt từ đầu kỳ làm việc — đến cuối kỳ mới có cơ sở chấm</p>
+      </div>
+
+      <div class="timeline">
+        <div class="tstep">
+          <span class="tnum c-slate">B0</span>
+          <div class="tstep-top"><h4>Chốt OKR/KPI &amp; ngưỡng chấm (đầu kỳ)</h4><span class="tday">THÁNG 1 / THÁNG 7</span></div>
+          <p>Ngay đầu kỳ 6 tháng: PIC nhận mục tiêu tăng trưởng sản phẩm; non-PIC chốt 2–3 KPI cá nhân gắn sản phẩm cùng quản lý; công bố ngưỡng chấm point &amp; chất lượng. Không chốt đầu kỳ = không có cơ sở chấm cuối kỳ.</p>
+        </div>
+
+        <div class="tflag info">▶ 2 TUẦN REVIEW BẮT ĐẦU</div>
+
+        <div class="tstep">
+          <span class="tnum c-purple">B1</span>
+          <div class="tstep-top"><h4>Kick-off kỳ review</h4><span class="tday">NGÀY 1</span></div>
+          <p>Quản lý thông báo kỳ review, gửi form self-review + form đánh giá chéo, chốt deadline từng bước cho cả team và đặt lịch họp BQT (ngày 10–11).</p>
+        </div>
+
+        <div class="tstep">
+          <span class="tnum c-blue">B2</span>
+          <div class="tstep-top"><h4>Tổng hợp số liệu kết quả công việc</h4><span class="tday">NGÀY 1–3</span></div>
+          <p>Quản lý xuất số liệu 6 tháng: story &amp; point từ tracker, bug/rework, tăng trưởng sản phẩm/KPI. Lập <strong>Contribution Summary</strong> cho từng người: sản phẩm tham gia, tính năng đã ship, point đóng góp, KPI đạt/trượt.</p>
+        </div>
+
+        <div class="tstep">
+          <span class="tnum c-cyan">B3</span>
+          <div class="tstep-top"><h4>Self-review + Đánh giá chéo (song song)</h4><span class="tday">NGÀY 1–5</span></div>
+          <p>Mỗi member nộp self-review (việc nổi bật, khó khăn, mục tiêu kỳ tới) và chấm ẩn danh tất cả người còn lại theo 6 tiêu chí có trọng số, kèm nhận xét text.</p>
+        </div>
+
+        <div class="tflag">⏰ DEADLINE CỨNG — HẾT NGÀY 5</div>
+
+        <div class="tstep">
+          <span class="tnum c-purple">B4</span>
+          <div class="tstep-top"><h4>Quản lý đánh giá (30%)</h4><span class="tday">NGÀY 4–7</span></div>
+          <p>Chấm 6 tiêu chí thang 1–5 dựa trên quan sát + bằng chứng, đối chiếu self-review. Điểm quản lý tách riêng, không gộp vào trung bình peer.</p>
+        </div>
+
+        <div class="tstep">
+          <span class="tnum c-orange">B5</span>
+          <div class="tstep-top"><h4>Tổng hợp, Calibration &amp; lập đề xuất</h4><span class="tday">NGÀY 8–9</span></div>
+          <p>Gộp 3 nguồn theo trọng số → điểm tổng + xếp loại. Rà soát điểm peer bất thường (chấm phẳng, trả đũa, thông đồng), recency bias. Lập bảng đề xuất mức tăng lương từng người.</p>
+        </div>
+
+        <div class="tstep">
+          <span class="tnum c-red">B6</span>
+          <div class="tstep-top"><h4>Họp BQT phê duyệt</h4><span class="tday">NGÀY 10–11</span></div>
+          <p>Quản lý trình bảng kết quả + Contribution Summary + đề xuất tăng lương. BQT quyết định tăng/không tăng và mức cụ thể theo ngân sách — quản lý chỉ đề xuất, quyền quyết định thuộc BQT.</p>
+        </div>
+
+        <div class="tflag">🔒 CHƯA CÓ PHÊ DUYỆT BQT — KHÔNG CÔNG BỐ KẾT QUẢ</div>
+
+        <div class="tstep">
+          <span class="tnum c-green">B7</span>
+          <div class="tstep-top"><h4>1-1 Feedback &amp; chốt kết quả</h4><span class="tday">NGÀY 12–14</span></div>
+          <p>Họp riêng từng người 30–45 phút: kết quả đã duyệt, điểm mạnh, điểm cần cải thiện, mục tiêu kỳ tới. Gửi văn bản chính thức — member có 7 ngày phản hồi/khiếu nại.</p>
+        </div>
+
+        <div class="tbranches">
+          <div class="branch pass">
+            <h5>✓ ĐẠT TRỞ LÊN (≥3.0)</h5>
+            <p>Mức tăng đã được BQT duyệt → HR/Kế toán áp dụng từ kỳ lương kế tiếp</p>
+          </div>
+          <div class="branch fail">
+            <h5>✗ DƯỚI ĐẠT (&lt;3.0)</h5>
+            <p>Không tăng lương. Lập kế hoạch cải thiện (PIP) 2 tháng → review lại</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="hint">💡 <strong>B2, B3, B4 chạy song song</strong> để gói gọn trong 2 tuần. Nếu ai nộp form trễ deadline B3 → tính như không nộp, phần peer của người đó lấy trung bình từ những người còn lại.</div>
+    </div>
+
+  </div>
+
+  <!-- ====== TAB 2: TIÊU CHÍ & THANG ĐIỂM ====== -->
+  <div class="tab-content" id="tab-2">
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Cơ cấu điểm chi tiết</h2>
+        <p>Tất cả quy về thang 5. Điểm tổng = KQ × 0.5 + QL × 0.3 + Peer × 0.2</p>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Nguồn</th><th>Tiêu chí</th><th>Trọng số</th><th>Cách chấm</th></tr></thead>
+        <tbody>
+        <tr><td rowspan="3"><strong>Kết quả công việc</strong><br><span class="badge blue">50%</span></td>
+            <td><strong>OKR công ty &amp; KPI cá nhân</strong> (ưu tiên cao nhất)</td><td class="num">20%</td><td><strong>PIC:</strong> % đạt mục tiêu tăng trưởng sản phẩm phụ trách (user active, doanh thu, GP2) theo Product Review. <strong>Non-PIC:</strong> % đạt 2–3 KPI cá nhân gắn sản phẩm, chốt với quản lý từ đầu kỳ. Cùng thang: ≥100% → 5đ · 90–99% → 4đ · 80–89% → 3đ · 70–79% → 2đ · &lt;70% → 1đ</td></tr>
+        <tr><td>Story &amp; Point hoàn thành (tracker)</td><td class="num">15%</td><td>So với <strong>trung vị point của team</strong> trong kỳ: ≥150% → 5đ · 120–149% → 4đ · 80–119% → 3đ · 55–79% → 2đ · &lt;55% → 1đ. Quản lý điều chỉnh theo role/độ khó</td></tr>
+        <tr><td>Chất lượng (bug/rework)</td><td class="num">15%</td><td>Theo số bug production + tỷ lệ rework do lỗi bản thân, ngưỡng chốt đầu kỳ</td></tr>
+        <tr><td><strong>Quản lý trực tiếp</strong><br><span class="badge purple">30%</span></td>
+            <td>Cùng bộ 6 tiêu chí như peer review</td><td class="num">30%</td><td>Chấm 1–5 theo trọng số tiêu chí, tách riêng khỏi trung bình peer. Nhận xét phải kèm ví dụ cụ thể</td></tr>
+        <tr><td><strong>Đánh giá chéo</strong><br><span class="badge green">20%</span></td>
+            <td>Chất lượng công việc <strong>25%</strong> · Tần suất làm việc · Hợp tác teamwork · Chủ động hỗ trợ · Đảm bảo deadline · Thái độ &amp; trách nhiệm (mỗi tiêu chí 15%)</td><td class="num">20%</td><td>Cả team chấm 1–5 ẩn danh, trung bình có trọng số, tự đánh giá không tính. Kèm nhận xét ngắn</td></tr>
+        </tbody>
+      </table></div>
+      <div class="table-wrap" style="margin-top: 14px;"><table class="zebra">
+        <thead><tr><th>Điểm chấm</th><th>Ý nghĩa — áp dụng khi chấm từng tiêu chí (QL &amp; Peer)</th></tr></thead>
+        <tbody>
+        <tr><td class="num"><strong>5</strong></td><td>Rất tốt — vượt kỳ vọng rõ rệt, có ví dụ nổi bật</td></tr>
+        <tr><td class="num"><strong>4</strong></td><td>Tốt — làm tốt ổn định, hơn mức yêu cầu</td></tr>
+        <tr><td class="num"><strong>3</strong></td><td>Đạt — đúng kỳ vọng của vị trí</td></tr>
+        <tr><td class="num"><strong>2</strong></td><td>Cần cải thiện — dưới kỳ vọng, có vấn đề lặp lại</td></tr>
+        <tr><td class="num"><strong>1</strong></td><td>Yếu — không đáp ứng, ảnh hưởng đến team</td></tr>
+        </tbody>
+      </table></div>
+      <div class="hint">📐 <strong>Ví dụ:</strong> Kết quả 4.2 · Quản lý 4.0 · Peer 3.8 → Điểm tổng = 4.2×0.5 + 4.0×0.3 + 3.8×0.2 = <strong>4.06 → Tốt</strong>. Ngưỡng chấm point/KPI do quản lý chốt và công bố đầu mỗi kỳ. Dùng <strong>trung vị</strong> thay vì trung bình để 1 người có point vượt trội không kéo lệch chuẩn của cả team — và point là proxy khối lượng, không phải mục tiêu để chạy số.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Xếp loại &amp; mức tăng lương</h2>
+        <p>Khung % là mức đề xuất tham khảo — con số cuối cùng do BQT phê duyệt theo ngân sách từng kỳ</p>
+      </div>
+      <div class="table-wrap"><table class="zebra">
+        <thead><tr><th>Điểm tổng</th><th>Xếp loại</th><th>Đề xuất tăng lương</th></tr></thead>
+        <tbody>
+        <tr><td class="num"><strong>4.5 – 5.0</strong></td><td><span class="badge green">RẤT TỐT</span></td><td>+10% → +15%</td></tr>
+        <tr><td class="num"><strong>4.0 – 4.49</strong></td><td><span class="badge blue">TỐT</span></td><td>+6% → +10%</td></tr>
+        <tr><td class="num"><strong>3.0 – 3.99</strong></td><td><span class="badge orange">ĐẠT</span></td><td>+3% → +5%</td></tr>
+        <tr><td class="num"><strong>2.0 – 2.99</strong></td><td><span class="badge red">CẦN CẢI THIỆN</span></td><td>0% — kèm kế hoạch cải thiện</td></tr>
+        <tr><td class="num"><strong>&lt; 2.0</strong></td><td><span class="badge red">YẾU</span></td><td>0% — PIP chính thức</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Cơ chế tăng lương — 3 bước</h2>
+        <p>Merit % chỉ là lớp cuối. Trước đó phải neo lương theo thị trường để không mất người vì trả dưới giá</p>
+      </div>
+
+      <div class="phase plan">
+        <div class="phase-top">
+          <span class="ptag">BƯỚC 1</span>
+          <h3>Band lương theo thị trường</h3>
+          <span class="sla">BQT duyệt 1 lần/năm</span>
+        </div>
+        <ul>
+          <li>Xây <strong>band lương (min – max)</strong> cho từng role/level dựa trên dữ liệu thị trường VN: ITviec Salary Report, TopDev, Talentnet-Mercer</li>
+          <li>BQT duyệt band vào <strong>kỳ review đầu năm</strong>, dùng chung cho cả 2 kỳ</li>
+        </ul>
+      </div>
+
+      <div class="phase feedback">
+        <div class="phase-top">
+          <span class="ptag">BƯỚC 2</span>
+          <h3>Market adjustment — kéo về band</h3>
+          <span class="sla">Trước khi tính merit</span>
+        </div>
+        <ul>
+          <li>Ai đang <strong>dưới min band</strong> (và không thuộc diện cải thiện/PIP) → điều chỉnh về min band <strong>trước</strong>, tách riêng khỏi merit</li>
+          <li>Khoản này là <strong>trả đúng giá thị trường</strong>, không phải phần thưởng performance — không trừ vào khung merit</li>
+        </ul>
+      </div>
+
+      <div class="phase release">
+        <div class="phase-top">
+          <span class="ptag">BƯỚC 3</span>
+          <h3>Merit % theo xếp loại</h3>
+          <span class="sla">Theo bảng khung ở trên</span>
+        </div>
+        <ul>
+          <li>Áp % theo xếp loại lên <strong>nền lương sau adjustment</strong></li>
+          <li>Ai đã <strong>chạm max band</strong> mà vẫn Rất tốt → chuyển merit thành <strong>thưởng 1 lần</strong> thay vì tăng lương cứng, tránh vỡ band</li>
+        </ul>
+      </div>
+
+      <div class="hint">📐 <strong>Ví dụ:</strong> Dev lương 8M, min band của level là 10M (số ví dụ), kỳ này xếp loại Tốt. Bước 2: kéo 8M → 10M (market adjustment +2M). Bước 3: merit Tốt +4% trên nền 10M = +400K → lương mới <strong>10.4M</strong>. Nếu bỏ Bước 2 mà chỉ +4% trên 8M thì ra 8.32M — % nhìn đẹp nhưng vẫn dưới giá thị trường, người vẫn nghỉ.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Xử lý trường hợp dưới chuẩn</h2>
+      </div>
+
+      <div class="level p1">
+        <div class="level-top">
+          <span class="ptag">CẦN CẢI THIỆN</span>
+          <h3>Điểm 2.0 – 2.99</h3>
+          <span class="sla">Theo dõi 2 tháng</span>
+        </div>
+        <ul>
+          <li><strong>Không tăng lương</strong> kỳ này, không xử lý gì thêm về lương</li>
+          <li>Quản lý cùng member lập <strong>kế hoạch cải thiện</strong>: 2–3 mục tiêu cụ thể, đo được trong 2 tháng</li>
+          <li>Check-in <strong>2 tuần/lần</strong> để theo dõi tiến độ</li>
+        </ul>
+        <div class="action-box"><span class="icon">📈</span><span>Cải thiện tốt → đánh giá bình thường ở kỳ sau. Không cải thiện → chuyển sang PIP chính thức.</span></div>
+      </div>
+
+      <div class="level p0">
+        <div class="level-top">
+          <span class="ptag">YẾU</span>
+          <h3>Điểm dưới 2.0</h3>
+          <span class="sla">PIP 1–2 tháng</span>
+        </div>
+        <ul>
+          <li><strong>PIP chính thức bằng văn bản:</strong> mục tiêu rõ ràng, tiêu chí đo lường, deadline từng mốc</li>
+          <li>Check-in <strong>hàng tuần</strong> với quản lý, có ghi nhận kết quả từng buổi</li>
+        </ul>
+        <div class="action-box"><span class="icon">⚠️</span><span>Kết thúc PIP: đạt mục tiêu → tiếp tục làm việc bình thường. Không đạt → <strong>xem xét chấm dứt hợp đồng</strong> theo quy định.</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Trường hợp đặc biệt</h2>
+        <p>Nhân sự mới, nghỉ dài hạn, nghỉ việc giữa kỳ</p>
+      </div>
+      <div class="table-wrap"><table class="zebra">
+        <thead><tr><th>Trường hợp</th><th>Cách xử lý</th></tr></thead>
+        <tbody>
+        <tr><td><strong>Mới vào, làm &lt; 3 tháng trong kỳ</strong></td><td>Không xếp loại chính thức — chỉ họp 1-1 định hướng. Lương theo thỏa thuận thử việc/hợp đồng, xét chính thức ở kỳ kế tiếp</td></tr>
+        <tr><td><strong>Làm 3–6 tháng trong kỳ</strong></td><td>Review bình thường; point/KPI pro-rate theo thời gian thực làm rồi mới so với trung vị team</td></tr>
+        <tr><td><strong>Nghỉ dài hạn (thai sản, ốm đau...)</strong></td><td>Chỉ đánh giá thời gian thực làm, pro-rate tương tự; thời gian nghỉ không tính vào đánh giá</td></tr>
+        <tr><td><strong>Nghỉ việc trước khi chốt kết quả</strong></td><td>Dừng review, không hoàn tất xếp loại; dữ liệu đã thu thập lưu vào hồ sơ</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+  </div>
+
+  <!-- ====== TAB 3: NGUYÊN TẮC CHUNG ====== -->
+  <div class="tab-content" id="tab-3">
+
+    <div class="section">
+      <div class="section-head">
+        <h2>10 nguyên tắc bắt buộc</h2>
+        <p>Áp dụng cho tất cả người tham gia quy trình review</p>
+      </div>
+
+      <div class="rule"><span class="ric ok">✓</span><span><strong>Ẩn danh tuyệt đối</strong> — chỉ quản lý thấy dữ liệu peer review gốc; member chỉ nhận điểm trung bình và feedback đã được tổng hợp lại.</span></div>
+      <div class="rule"><span class="ric ok">✓</span><span><strong>Evidence-based</strong> — điểm kết quả công việc lấy từ hệ thống (US, bug, OKR/KPI); nhận xét quan trọng phải kèm ví dụ cụ thể.</span></div>
+      <div class="rule"><span class="ric ok">✓</span><span><strong>No surprise</strong> — vấn đề lớn phải được feedback ngay trong kỳ làm việc; buổi review không phải nơi lần đầu member nghe về vấn đề của mình.</span></div>
+      <div class="rule"><span class="ric ok">✓</span><span><strong>Đánh giá trọn 6 tháng</strong> — nhìn cả kỳ, tránh recency bias (chỉ nhớ 1–2 tháng gần nhất) và halo effect (1 việc tốt/xấu che hết phần còn lại).</span></div>
+      <div class="rule"><span class="ric ok">✓</span><span><strong>1-1 feedback bắt buộc</strong> — kết quả phải được trao đổi trực tiếp với từng người, không gửi điểm qua tin nhắn rồi xong.</span></div>
+      <div class="rule"><span class="ric ok">✓</span><span><strong>Quyền phản hồi</strong> — member có 7 ngày khiếu nại kèm bằng chứng sau khi nhận kết quả; quản lý trả lời trong 3 ngày làm việc. Không đồng ý với phản hồi → escalate lên BQT, quyết định của BQT là cuối cùng.</span></div>
+      <div class="rule"><span class="ric ok">✓</span><span><strong>Bảo mật kết quả</strong> — điểm số, xếp loại và mức lương là thông tin cá nhân; không chia sẻ, không so sánh công khai.</span></div>
+      <div class="rule"><span class="ric ok">✓</span><span><strong>Deadline cứng</strong> — nộp form trễ tính như không nộp; phần đánh giá thiếu sẽ lấy trung bình từ những người còn lại.</span></div>
+      <div class="rule"><span class="ric no">✗</span><span><strong>Không trả đũa / chấm cho xong qua peer review</strong> — điểm bất thường (thấp/cao lệch hẳn mặt bằng, chấm trả thù, thông đồng nâng điểm, chấm phẳng cùng một mức cho tất cả) sẽ bị loại hoặc giảm trọng số khi calibration.</span></div>
+      <div class="rule"><span class="ric no">✗</span><span><strong>Không dùng review xử lý mâu thuẫn cá nhân</strong> — đánh giá chỉ nói về công việc và hành vi chuyên môn; mâu thuẫn cá nhân xử lý riêng với quản lý.</span></div>
+
+      <div class="hint ok">🎯 <strong>Mục tiêu cuối cùng:</strong> review để mỗi người biết mình đang ở đâu và cần phát triển gì — tăng lương là kết quả của quá trình đó, không phải mục đích duy nhất.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>Biểu mẫu &amp; nguồn dữ liệu</h2>
+        <p>Bộ công cụ chạy kỳ review — quản lý giữ bản gốc, phân quyền theo nguyên tắc ẩn danh</p>
+      </div>
+      <div class="table-wrap"><table class="zebra">
+        <thead><tr><th>Công cụ / Biểu mẫu</th><th>Nội dung</th><th>Dùng ở bước</th></tr></thead>
+        <tbody>
+        <tr><td><strong>File Excel Review Performance</strong></td><td>Sheet Performance (story/point/task), Product Review (tăng trưởng + tài chính), Review chéo từng người, Tổng hợp Review, Lương</td><td class="num">B2–B6</td></tr>
+        <tr><td><strong>Tracker + Bug tracker</strong></td><td>Story, point, deadline, bug production, rework theo từng người</td><td class="num">B0, B2</td></tr>
+        <tr><td><strong>Bảng OKR/KPI đầu kỳ</strong></td><td>Mục tiêu tăng trưởng của PIC + KPI cá nhân của non-PIC, ngưỡng chấm point</td><td class="num">B0, B5</td></tr>
+        <tr><td><strong>Form self-review</strong></td><td>Việc nổi bật đã làm, khó khăn gặp phải, mục tiêu kỳ tới</td><td class="num">B3</td></tr>
+        <tr><td><strong>Contribution Summary</strong></td><td>Mỗi người 1 bản: sản phẩm tham gia, tính năng đã ship, point đóng góp, KPI đạt/trượt</td><td class="num">B2, B6, B7</td></tr>
+        <tr><td><strong>Biên bản 1-1 + Quyết định BQT</strong></td><td>Kết quả xếp loại, cam kết mục tiêu kỳ tới, mức tăng đã duyệt — HR lưu hồ sơ</td><td class="num">B6, B7</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function switchTab(i) {
+  document.querySelectorAll('.tab').forEach(function(t, j) { t.classList.toggle('active', j === i); });
+  document.querySelectorAll('.tab-content').forEach(function(c, j) { c.classList.toggle('active', j === i); });
+  var hero = document.querySelector('.hero');
+  if (window.scrollY > hero.offsetHeight) {
+    window.scrollTo({ top: hero.offsetHeight, behavior: reduced ? 'auto' : 'smooth' });
+  }
+}
+
+var tabbar = document.getElementById('tabbar');
+window.addEventListener('scroll', function() {
+  tabbar.classList.toggle('scrolled', window.scrollY > 10);
+}, { passive: true });
+</script>
+</body>
+</html>
