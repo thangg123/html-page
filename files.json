@@ -1,5 +1,17 @@
 [
   {
+    "file": "playback-prototype.html",
+    "title": "Prototype — Playback (Paid) xem lại"
+  },
+  {
+    "file": "download-prototype.html",
+    "title": "Prototype — Tải video (Download)"
+  },
+  {
+    "file": "ball-path-editor-prototype.html",
+    "title": "Prototype — Vẽ đường bi (Editor)"
+  },
+  {
     "file": "quy-trinh-qc-tinh-nang.html",
     "title": "Quy trình QC tính năng"
   },
