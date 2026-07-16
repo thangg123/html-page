@@ -91,7 +91,19 @@
   /* #12 Vẽ đường bi editor */
   .draw{display:none;position:absolute;inset:0;background:rgba(3,6,12,.97);z-index:110;flex-direction:column;align-items:center;justify-content:center;padding:20px}.draw.on{display:flex}
   .draw h3{font-size:17px;font-weight:800}.draw .sub{font-size:11px;color:rgba(255,255,255,.55);margin:3px 0 12px}
+  .dbody{width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center}
+  .dside{width:100%;display:flex;flex-direction:column;align-items:center}
   .dcanvas{width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;position:relative;border:1px solid var(--line-2);background:radial-gradient(120% 90% at 60% 30%,#2b3446,#0d1017 78%);touch-action:none;cursor:crosshair}
+  /* Fullscreen landscape: mở từ 📷 trong fullscreen → canvas TRÁI, công cụ PHẢI (giống app editor fullscreen). Trên máy dọc → xoay 90° (xoay ngang máy để vẽ). */
+  .draw.fsmode{position:fixed;z-index:130;padding:12px 20px;justify-content:center}
+  .draw.fsmode>h3,.draw.fsmode>.sub{display:none}
+  .draw.fsmode .dbody{flex-direction:row;max-width:none;width:100%;height:100%;gap:18px;align-items:center;justify-content:center}
+  .draw.fsmode .dcanvas{width:auto;height:82%;aspect-ratio:16/9;flex:0 1 auto;min-width:0}
+  .draw.fsmode .dside{width:auto;flex:0 0 auto;max-width:300px;justify-content:center}
+  .draw.fsmode .dtools{margin-top:0}
+  @media (orientation:portrait) and (max-width:900px){
+    .draw.fsmode.on{top:0;left:100vw;width:100vh;height:100vw;transform:rotate(90deg);transform-origin:top left}
+  }
   .dcanvas svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
   .dtools{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;max-width:300px;margin-left:auto;margin-right:auto}
   .dtool{min-width:0;padding:7px 10px;border-radius:11px;border:1px solid var(--line-2);background:rgba(255,255,255,.05);text-align:center;cursor:pointer}
@@ -207,6 +219,7 @@
     <!-- #12 Vẽ đường bi -->
     <div class="draw" id="draw">
       <h3>Vẽ đường bi</h3><div class="sub">Vẽ mũi tên · đường bi · ghost-ball</div>
+      <div class="dbody">
       <div class="dcanvas" id="dcanvas">
         <div class="felt" style="left:12%;right:10%;top:34%;bottom:14%;border-width:6px">
           <div class="ball" style="left:28%;top:44%;background:radial-gradient(circle at 35% 30%,#fff,#c7cdd6)"></div>
@@ -216,6 +229,7 @@
         <div class="stamp">12‑07‑2026 · 05:50:08</div>
         <svg id="dsvg"></svg>
       </div>
+      <div class="dside">
       <div class="dtools" id="dtools">
         <div class="dtool on" data-tool="path"><div class="g">⤳</div><div class="l">Đường bi</div></div>
         <div class="dtool" data-tool="arrow"><div class="g">↗</div><div class="l">Mũi tên</div></div>
@@ -227,6 +241,8 @@
       <div class="dphint" id="dphint">Chạm lần lượt các điểm (bi → chạm băng → lỗ) → app tự nối thành đường cong mượt.</div>
       <div class="dcolors" id="dcolors"></div>
       <div class="dact"><button class="dbtn g" id="dClose">Đóng</button><button class="dbtn b" id="dShare">Lưu / Chia sẻ</button></div>
+      </div>
+      </div>
     </div>
 
     <div class="toast" id="toast"></div>
@@ -365,9 +381,10 @@
     return d;}
   function dCommitPath(){if(dpath.length>=2)shapes.push({t:'path',c:dPathC,pts:dpath.slice()});dpath=[];cur=null;}
   $('dcolors').innerHTML=DCOLORS.map(function(c,i){return '<div class="sw'+(i===1?' on':'')+'" data-c="'+c+'" style="background:'+c+'"></div>';}).join('');
-  $('drawBtn').addEventListener('click',function(){$('shareModal').classList.remove('on');shapes=[];cur=null;dpath=[];redraw();draw.classList.add('on');});
-  $('dClose').addEventListener('click',function(){draw.classList.remove('on');});
-  $('dShare').addEventListener('click',function(){dCommitPath();draw.classList.remove('on');toast('Đã lưu ảnh đường bi · mở chia sẻ…');});
+  $('drawBtn').addEventListener('click',function(){$('shareModal').classList.remove('on');shapes=[];cur=null;dpath=[];redraw();draw.classList.remove('fsmode');draw.classList.add('on');});
+  // Đóng/Lưu: bỏ fsmode → nếu mở từ fullscreen thì fs.on vẫn còn phía sau → về fullscreen.
+  $('dClose').addEventListener('click',function(){draw.classList.remove('on');draw.classList.remove('fsmode');});
+  $('dShare').addEventListener('click',function(){dCommitPath();draw.classList.remove('on');draw.classList.remove('fsmode');toast('Đã lưu ảnh đường bi · mở chia sẻ…');});
   $('dtools').addEventListener('click',function(e){var tl=e.target.closest('.dtool');if(!tl)return;
     if(tl.id==='dundo'){if(dpath.length){dpath.pop();cur=dpath.length?{t:'path',c:dPathC,pts:dpath.slice()}:null;}else shapes.pop();redraw();return;}
     if(tl.id==='dclear'){shapes=[];dpath=[];cur=null;redraw();return;}
@@ -420,11 +437,13 @@
 
   function openShare(){$('shareModal').classList.add('on');}
   $('snapBtn').addEventListener('click',function(){if(!paid)return up();openShare();});
-  // 📷 trong fullscreen: thoát fullscreen (vì editor vẽ ở lớp dưới) → mở thẳng
-  // editor Vẽ đường bi trên khung vừa chụp.
+  // 📷 trong fullscreen: mở editor "Vẽ đường bi" ở chế độ LANDSCAPE đè trên
+  // fullscreen (GIỮ máy ngang, không thoát về dọc — giống app). fs.on giữ nguyên
+  // phía sau (z-index 130 > 120) → Đóng/Lưu xong quay lại fullscreen.
   $('fsSnap').addEventListener('click',function(e){e.stopPropagation();
-    $('fs').classList.remove('on');$('shareModal').classList.remove('on');
-    shapes=[];cur=null;dpath=[];redraw();draw.classList.add('on');});
+    $('shareModal').classList.remove('on');
+    shapes=[];cur=null;dpath=[];redraw();
+    draw.classList.add('fsmode');draw.classList.add('on');});
   $('shareClose').addEventListener('click',function(){$('shareModal').classList.remove('on');});
   document.querySelectorAll('.ap').forEach(function(a){a.addEventListener('click',function(){toast('Đang mở '+a.dataset.app+'…');});});
 
