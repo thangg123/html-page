@@ -420,7 +420,11 @@
 
   function openShare(){$('shareModal').classList.add('on');}
   $('snapBtn').addEventListener('click',function(){if(!paid)return up();openShare();});
-  $('fsSnap').addEventListener('click',function(e){e.stopPropagation();openShare();});
+  // 📷 trong fullscreen: thoát fullscreen (vì editor vẽ ở lớp dưới) → mở thẳng
+  // editor Vẽ đường bi trên khung vừa chụp.
+  $('fsSnap').addEventListener('click',function(e){e.stopPropagation();
+    $('fs').classList.remove('on');$('shareModal').classList.remove('on');
+    shapes=[];cur=null;dpath=[];redraw();draw.classList.add('on');});
   $('shareClose').addEventListener('click',function(){$('shareModal').classList.remove('on');});
   document.querySelectorAll('.ap').forEach(function(a){a.addEventListener('click',function(){toast('Đang mở '+a.dataset.app+'…');});});
 
