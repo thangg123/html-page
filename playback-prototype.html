@@ -64,10 +64,14 @@
   .mhint{text-align:center;color:rgba(255,255,255,.6);font-size:12px;margin:12px 0 14px}.mhint b{color:#fff}
   .mshare{display:flex;justify-content:center;gap:22px}.ap{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
   .disc{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:23px;color:#fff}
-  .disc.fb{background:#1877F2}.disc.tt{background:#0b0b0d;border:1px solid #25F4EE}.disc.zl{background:#0068FF}.ap span{font-size:12px;color:rgba(255,255,255,.85);font-weight:600}
+  .disc.fb{background:#1877F2}.disc.tt{background:#0b0b0d;border:1px solid #25F4EE}.disc.zl{background:#0068FF;border-radius:15px;font-size:13px}.ap span{font-size:12px;color:rgba(255,255,255,.85);font-weight:600}
   .mclose{margin:16px auto 2px;display:block;padding:10px 28px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid var(--line);color:#fff;font-weight:700;font-size:14px;cursor:pointer}
   .up{text-align:center}.up .ico{font-size:34px}.up h2{margin:6px 0 4px}.up p{color:rgba(255,255,255,.6);font-size:13px;margin-bottom:6px}
   .toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;font-size:13px;font-weight:600;padding:9px 16px;border-radius:12px;z-index:200;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}.toast.on{opacity:1}
+  .snapwait{display:none;position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:center;justify-content:center}.snapwait.on{display:flex}
+  .swbox{background:#0d1b34;border:1px solid var(--line-2);border-radius:16px;padding:22px 28px;text-align:center}.swtxt{margin-top:12px;font-size:14px;font-weight:700}
+  .mrow{display:flex;gap:10px;justify-content:center;margin-top:14px}.mrow .mclose{margin:0}
+  .msave{display:inline-flex;align-items:center;gap:6px;padding:10px 24px;border-radius:12px;background:#00A65A;border:none;color:#fff;font-weight:800;font-size:14px;cursor:pointer}.msave.done{background:rgba(0,166,90,.4)}
 
   /* #9 Bookmarks */
   .bmadd{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:800;color:#0a0f1a;background:var(--gold);padding:5px 10px;border-radius:9px;cursor:pointer}
@@ -193,10 +197,10 @@
 
     <div class="modal" id="shareModal"><div class="mcard"><h2>Đã chụp khoảnh khắc</h2>
       <div class="mprev"><div class="felt" style="left:12%;right:10%;top:36%;bottom:12%;border-width:6px"><div class="ball" style="left:28%;top:44%;background:radial-gradient(circle at 35% 30%,#fff,#c7cdd6)"></div><div class="ball" style="left:52%;top:40%;background:radial-gradient(circle at 35% 30%,#ffd34d,#c98a00)"></div></div><div class="wm">✦ ARENA</div></div>
-      <div class="mhint"><b>Đã lưu vào thư viện</b> · Chia sẻ lên</div>
-      <div class="mshare"><div class="ap" data-app="Facebook"><div class="disc fb">f</div><span>Facebook</span></div><div class="ap" data-app="TikTok"><div class="disc tt">♪</div><span>TikTok</span></div><div class="ap" data-app="Zalo"><div class="disc zl">Z</div><span>Zalo</span></div></div>
+      <div class="mhint">Xem trước · <b>Lưu hoặc chia sẻ</b></div>
+      <div class="mshare"><div class="ap" data-app="Facebook"><div class="disc fb">f</div><span>Facebook</span></div><div class="ap" data-app="Zalo"><div class="disc zl">Zalo</div><span>Zalo</span></div></div>
       <button class="dbtn b" id="drawBtn" style="width:100%;margin:14px 0 0">✏️ Vẽ đường bi</button>
-      <button class="mclose" id="shareClose">Đóng</button></div></div>
+      <div class="mrow"><button class="mclose" id="shareClose">Đóng</button><button class="msave" id="snapSave"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="#fff" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Lưu</button></div></div></div>
     <div class="modal" id="upModal"><div class="mcard up"><div class="ico">👑</div><h2>Tính năng gói Paid</h2><p>Nâng cấp club để mở khoá.</p><button class="mclose" id="upClose">Đóng</button></div></div>
 
     <!-- #17 Tải clip A–B: tiến trình + popup chia sẻ video -->
@@ -229,7 +233,7 @@
         </div>
         <div class="stamp">12‑07‑2026 · 05:50:08</div>
         <svg id="dsvg"></svg>
-        <div class="dfsbtn" id="dFsBtn" title="Toàn màn hình">⛶</div>
+        <div class="dfsbtn" id="dFsBtn" title="Toàn màn hình"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="#fff" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></div>
       </div>
       <div class="dside">
       <div class="dtools" id="dtools">
@@ -242,11 +246,12 @@
       </div>
       <div class="dphint" id="dphint">Chạm lần lượt các điểm (bi → chạm băng → lỗ) → app tự nối thành đường cong mượt.</div>
       <div class="dcolors" id="dcolors"></div>
-      <div class="dact"><button class="dbtn g" id="dClose">Đóng</button><button class="dbtn b" id="dShare">Lưu / Chia sẻ</button></div>
+      <div class="dact"><button class="dbtn g" id="dClose">Đóng</button><button class="dbtn b" id="dShare">Xong</button></div>
       </div>
       </div>
     </div>
 
+    <div class="snapwait" id="snapWait"><div class="swbox"><div class="spinner"></div><div class="swtxt">Đang chụp…</div></div></div>
     <div class="toast" id="toast"></div>
   </div></div>
 
@@ -374,6 +379,9 @@
   var draw=$('draw'),dsvg=$('dsvg'),dcanvas=$('dcanvas'),dTool='path',dColor='#0097FE',shapes=[],cur=null;
   var dpath=[],dPathC='#0097FE'; // đường bi bán tự động (điểm chạm tích luỹ)
   var DCOLORS=['#ffffff','#0097FE','#e6171b','#FFC700','#00CD50'];
+  // Icon phóng to (4 góc ra) / thu lại (4 góc vào) — dùng SVG cho đúng.
+  var FS_EXPAND='<svg width="16" height="16" viewBox="0 0 24 24"><path fill="#fff" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>';
+  var FS_COLLAPSE='<svg width="16" height="16" viewBox="0 0 24 24"><path fill="#fff" d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>';
   // Catmull-Rom → bezier: nối các điểm chạm thành đường cong mượt (giống app).
   function dsmooth(pts,Y){if(pts.length<2)return '';if(pts.length===2)return 'M '+pts[0][0]+' '+Y(pts[0][1])+' L '+pts[1][0]+' '+Y(pts[1][1]);
     var d='M '+pts[0][0]+' '+Y(pts[0][1]);
@@ -383,14 +391,14 @@
     return d;}
   function dCommitPath(){if(dpath.length>=2)shapes.push({t:'path',c:dPathC,pts:dpath.slice()});dpath=[];cur=null;}
   $('dcolors').innerHTML=DCOLORS.map(function(c,i){return '<div class="sw'+(i===1?' on':'')+'" data-c="'+c+'" style="background:'+c+'"></div>';}).join('');
-  $('drawBtn').addEventListener('click',function(){$('shareModal').classList.remove('on');shapes=[];cur=null;dpath=[];redraw();draw.classList.remove('fsmode');$('dFsBtn').textContent='⛶';draw.classList.add('on');});
+  $('drawBtn').addEventListener('click',function(){$('shareModal').classList.remove('on');shapes=[];cur=null;dpath=[];redraw();draw.classList.remove('fsmode');$('dFsBtn').innerHTML=FS_EXPAND;draw.classList.add('on');});
   // Đóng/Lưu: bỏ fsmode → nếu mở từ fullscreen thì fs.on vẫn còn phía sau → về fullscreen.
   $('dClose').addEventListener('click',function(){draw.classList.remove('on');draw.classList.remove('fsmode');});
-  $('dShare').addEventListener('click',function(){dCommitPath();draw.classList.remove('on');draw.classList.remove('fsmode');toast('Đã lưu ảnh đường bi · mở chia sẻ…');});
+  $('dShare').addEventListener('click',function(){dCommitPath();var wasFs=draw.classList.contains('fsmode');draw.classList.remove('on');draw.classList.remove('fsmode');if(wasFs){toast('Xong · quay lại toàn màn hình');}else{resetSnapSave();$('shareModal').classList.add('on');toast('Xong · xem trước ảnh đã vẽ');}});
   // Nút ⛶ trên canvas: bật/tắt layout LANDSCAPE (xoay điện thoại). stopPropagation
   // để bấm nút không bị tính là chấm điểm vẽ.
   ['mousedown','touchstart'].forEach(function(ev){$('dFsBtn').addEventListener(ev,function(e){e.stopPropagation();},{passive:true});});
-  $('dFsBtn').addEventListener('click',function(e){e.stopPropagation();var on=draw.classList.toggle('fsmode');$('dFsBtn').textContent=on?'⊟':'⛶';});
+  $('dFsBtn').addEventListener('click',function(e){e.stopPropagation();var on=draw.classList.toggle('fsmode');$('dFsBtn').innerHTML=on?FS_COLLAPSE:FS_EXPAND;});
   $('dtools').addEventListener('click',function(e){var tl=e.target.closest('.dtool');if(!tl)return;
     if(tl.id==='dundo'){if(dpath.length){dpath.pop();cur=dpath.length?{t:'path',c:dPathC,pts:dpath.slice()}:null;}else shapes.pop();redraw();return;}
     if(tl.id==='dclear'){shapes=[];dpath=[];cur=null;redraw();return;}
@@ -441,17 +449,23 @@
   $('jumpClose').addEventListener('click',function(){$('jumpModal').classList.remove('on');});
   $('jGo').addEventListener('click',function(){var h=+$('jH').value||0,m=+$('jM').value||0,s=+$('jS').value||0;t=h*3600+m*60+s;clamp();render();$('jumpModal').classList.remove('on');toast('Nhảy tới '+fmt(t));});
 
-  function openShare(){$('shareModal').classList.add('on');}
-  $('snapBtn').addEventListener('click',function(){if(!paid)return up();openShare();});
+  var SNAP_SAVE_HTML='<svg width="15" height="15" viewBox="0 0 24 24"><path fill="#fff" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Lưu';
+  var snapSaved=false;
+  function resetSnapSave(){snapSaved=false;var b=$('snapSave');if(b){b.classList.remove('done');b.innerHTML=SNAP_SAVE_HTML;}}
+  function doSnapSave(){if(snapSaved)return;snapSaved=true;var b=$('snapSave');if(b){b.classList.add('done');b.textContent='✓ Đã lưu';}toast('Đã lưu vào thư viện');}
+  function openShare(){resetSnapSave();$('shareModal').classList.add('on');}
+  function snapCapture(then){var w=$('snapWait');w.classList.add('on');setTimeout(function(){w.classList.remove('on');then();},800);}
+  $('snapSave').addEventListener('click',doSnapSave);
+  $('snapBtn').addEventListener('click',function(){if(!paid)return up();snapCapture(openShare);});
   // 📷 trong fullscreen: mở editor "Vẽ đường bi" ở chế độ LANDSCAPE đè trên
   // fullscreen (GIỮ máy ngang, không thoát về dọc — giống app). fs.on giữ nguyên
   // phía sau (z-index 130 > 120) → Đóng/Lưu xong quay lại fullscreen.
   $('fsSnap').addEventListener('click',function(e){e.stopPropagation();
     $('shareModal').classList.remove('on');
     shapes=[];cur=null;dpath=[];redraw();
-    draw.classList.add('fsmode');$('dFsBtn').textContent='⊟';draw.classList.add('on');});
+    draw.classList.add('fsmode');$('dFsBtn').innerHTML=FS_COLLAPSE;draw.classList.add('on');});
   $('shareClose').addEventListener('click',function(){$('shareModal').classList.remove('on');});
-  document.querySelectorAll('.ap').forEach(function(a){a.addEventListener('click',function(){toast('Đang mở '+a.dataset.app+'…');});});
+  document.querySelectorAll('.ap').forEach(function(a){a.addEventListener('click',function(){if(a.closest('#shareModal'))doSnapSave();toast('Đang mở '+a.dataset.app+'…');});});
 
   // FULLSCREEN
   var fs=$('fs'),fsChrome=$('fsChrome'),fsZoom=$('fsZoom'),fsVideo=$('fsVideo'),chromeTimer;
