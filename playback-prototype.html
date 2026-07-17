@@ -196,7 +196,7 @@
     <div class="home"></div>
 
     <div class="modal" id="shareModal"><div class="mcard"><h2>Đã chụp khoảnh khắc</h2>
-      <div class="mprev"><div class="felt" style="left:12%;right:10%;top:36%;bottom:12%;border-width:6px"><div class="ball" style="left:28%;top:44%;background:radial-gradient(circle at 35% 30%,#fff,#c7cdd6)"></div><div class="ball" style="left:52%;top:40%;background:radial-gradient(circle at 35% 30%,#ffd34d,#c98a00)"></div></div><div class="wm">✦ ARENA</div></div>
+      <div class="mprev"><div class="felt" style="left:12%;right:10%;top:36%;bottom:12%;border-width:6px"><div class="ball" style="left:28%;top:44%;background:radial-gradient(circle at 35% 30%,#fff,#c7cdd6)"></div><div class="ball" style="left:52%;top:40%;background:radial-gradient(circle at 35% 30%,#ffd34d,#c98a00)"></div></div><svg id="mprevSvg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></svg><div class="wm">✦ ARENA</div></div>
       <div class="mhint">Xem trước · <b>Lưu hoặc chia sẻ</b></div>
       <div class="mshare"><div class="ap" data-app="Facebook"><div class="disc fb">f</div><span>Facebook</span></div><div class="ap" data-app="Zalo"><div class="disc zl">Zalo</div><span>Zalo</span></div></div>
       <button class="dbtn b" id="drawBtn" style="width:100%;margin:14px 0 0">✏️ Vẽ đường bi</button>
@@ -394,7 +394,7 @@
   $('drawBtn').addEventListener('click',function(){$('shareModal').classList.remove('on');shapes=[];cur=null;dpath=[];redraw();draw.classList.remove('fsmode');$('dFsBtn').innerHTML=FS_EXPAND;draw.classList.add('on');});
   // Đóng/Lưu: bỏ fsmode → nếu mở từ fullscreen thì fs.on vẫn còn phía sau → về fullscreen.
   $('dClose').addEventListener('click',function(){draw.classList.remove('on');draw.classList.remove('fsmode');});
-  $('dShare').addEventListener('click',function(){dCommitPath();var wasFs=draw.classList.contains('fsmode');draw.classList.remove('on');draw.classList.remove('fsmode');if(wasFs){toast('Xong · quay lại toàn màn hình');}else{resetSnapSave();$('shareModal').classList.add('on');toast('Xong · xem trước ảnh đã vẽ');}});
+  $('dShare').addEventListener('click',function(){dCommitPath();var wasFs=draw.classList.contains('fsmode');draw.classList.remove('on');draw.classList.remove('fsmode');if(wasFs){toast('Xong · quay lại toàn màn hình');}else{renderShapesTo($('mprevSvg'));resetSnapSave();$('shareModal').classList.add('on');toast('Xong · xem trước ảnh đã vẽ');}});
   // Nút ⛶ trên canvas: bật/tắt layout LANDSCAPE (xoay điện thoại). stopPropagation
   // để bấm nút không bị tính là chấm điểm vẽ.
   ['mousedown','touchstart'].forEach(function(ev){$('dFsBtn').addEventListener(ev,function(e){e.stopPropagation();},{passive:true});});
@@ -453,7 +453,8 @@
   var snapSaved=false;
   function resetSnapSave(){snapSaved=false;var b=$('snapSave');if(b){b.classList.remove('done');b.innerHTML=SNAP_SAVE_HTML;}}
   function doSnapSave(){if(snapSaved)return;snapSaved=true;var b=$('snapSave');if(b){b.classList.add('done');b.textContent='✓ Đã lưu';}toast('Đã lưu vào thư viện');}
-  function openShare(){resetSnapSave();$('shareModal').classList.add('on');}
+  function renderShapesTo(svg){if(!svg)return;svg.setAttribute('viewBox','0 0 100 56.25');svg.setAttribute('preserveAspectRatio','none');svg.innerHTML=shapes.map(function(s){return shp(s,false);}).join('');}
+  function openShare(){resetSnapSave();var ms=$('mprevSvg');if(ms)ms.innerHTML='';$('shareModal').classList.add('on');}
   function snapCapture(then){var w=$('snapWait');w.classList.add('on');setTimeout(function(){w.classList.remove('on');then();},800);}
   $('snapSave').addEventListener('click',doSnapSave);
   $('snapBtn').addEventListener('click',function(){if(!paid)return up();snapCapture(openShare);});
