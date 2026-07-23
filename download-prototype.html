@@ -553,8 +553,11 @@
             <g transform="translate(60 60) rotate(-8)">
               <rect x="0" y="0" width="200" height="100" rx="12" fill="#aab0b4"/>
               <circle cx="70" cy="52" r="5" fill="#fafafa"/><circle cx="120" cy="46" r="5" fill="#e6171b"/>
-              <path d="M70 52 Q 96 20 120 46" stroke="#0097fe" stroke-width="3" fill="none" stroke-linecap="round"/>
-              <circle cx="120" cy="46" r="9" fill="none" stroke="#0097fe" stroke-dasharray="3 3"/>
+              <!-- overlay đường bi CHỈ hiện sau khi đã vẽ (annCount>0) -->
+              <g id="stageAnn" style="display:none">
+                <path d="M70 52 Q 96 20 120 46" stroke="#0097fe" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <circle cx="120" cy="46" r="9" fill="none" stroke="#0097fe" stroke-dasharray="3 3"/>
+              </g>
             </g>
           </svg>
           <div class="ebadge etime">0:07 / 0:20</div>
@@ -582,34 +585,16 @@
           </div>
         </div>
 
-        <!-- Card "Vẽ đường bi" -->
+        <!-- Card "Vẽ đường bi" — DANH SÁCH DYNAMIC: vào trống, vẽ xong mới có
+             (đúng logic app: annotations.length===0 → nút "✎ Vẽ đường bi"). -->
         <div class="ecard">
           <div class="ehead">
             <i class="eaccent"></i><span class="etitle">Vẽ đường bi</span>
-            <span class="ecount">2</span>
+            <span class="ecount" id="annCountPill" style="display:none">0</span>
           </div>
-          <div class="annitem">
-            <div class="annhead">
-              <span class="anndot" style="background:#0097fe"></span>
-              <b>Đường bi #1</b><span class="annwin">0:04 → 0:12</span>
-            </div>
-            <div class="annact">
-              <button class="annedit">✎ Sửa</button>
-              <button class="anndel">🗑 Xoá</button>
-            </div>
-          </div>
-          <div class="annitem">
-            <div class="annhead">
-              <span class="anndot" style="background:#e6171b"></span>
-              <b>Đường bi #2</b><span class="annwin">0:15 → 0:20</span>
-            </div>
-            <div class="annact">
-              <button class="annedit">✎ Sửa</button>
-              <button class="anndel">🗑 Xoá</button>
-            </div>
-          </div>
-          <button class="mbtn" id="btnAddMore">＋ Thêm đường bi</button>
-          <div class="ehint">Mỗi đường 1 màu + 1 khoảng hiện riêng.</div>
+          <div id="annList"></div>
+          <button class="mbtn" id="btnAddMore">✎ Vẽ đường bi</button>
+          <div class="ehint" id="annHint">Tua tới pha bóng đẹp → Vẽ đường bi → chọn lúc hiện.</div>
         </div>
 
         <button class="exportbtn" id="btnExport">Xuất video</button>
@@ -668,7 +653,7 @@
 
         <button class="addmore">＋ Thêm đường bi</button>
 
-        <div class="chips" style="margin-top:4px">
+        <div class="chips" style="margin-top:4px;display:none" id="drawChips">
           <div class="lbl">1 đường · chạm để sửa</div>
           <div class="chip">
             <span class="dot" style="background:#00cd50"></span>
@@ -679,7 +664,7 @@
 
         <div class="rowbtns">
           <button class="b close" id="drawClose">Đóng</button>
-          <button class="b done">Xong</button>
+          <button class="b done" id="btnDrawDone">Xong</button>
         </div>
       </div>
     </section>
@@ -734,7 +719,7 @@
           </div>
           <div class="fsactions">
             <button class="b close" id="fsClose">Đóng</button>
-            <button class="b done">Xong</button>
+            <button class="b done" id="btnFsDone">Xong</button>
           </div>
         </div>
       </div>
@@ -928,6 +913,56 @@
   document.getElementById('btnShareClose').addEventListener('click', () => go('editor'));
   // "Chia sẻ lên Arena" — placeholder như app (chưa có action).
   document.getElementById('btnArena').addEventListener('click', () => {});
+
+  // ── Đường bi DYNAMIC: vào editor TRỐNG, bấm Xong ở canvas mới thêm ────
+  // (đúng logic app: annotations.length===0 → nút "✎ Vẽ đường bi" + hint mời vẽ)
+  const ANNS = [
+    { color: '#0097fe', win: '0:04 → 0:12' },
+    { color: '#e6171b', win: '0:15 → 0:20' },
+  ];
+  let annCount = 0;
+  function renderAnns() {
+    const list = document.getElementById('annList');
+    const pill = document.getElementById('annCountPill');
+    const btn = document.getElementById('btnAddMore');
+    const hint = document.getElementById('annHint');
+    const stage = document.getElementById('stageAnn');
+    const chips = document.getElementById('drawChips');
+    list.innerHTML = '';
+    for (let i = 0; i < annCount; i++) {
+      const a = ANNS[i];
+      const item = document.createElement('div');
+      item.className = 'annitem';
+      item.innerHTML =
+        '<div class="annhead">' +
+        `<span class="anndot" style="background:${a.color}"></span>` +
+        `<b>Đường bi #${i + 1}</b><span class="annwin">${a.win}</span>` +
+        '</div><div class="annact">' +
+        '<button class="annedit">✎ Sửa</button>' +
+        '<button class="anndel">🗑 Xoá</button></div>';
+      item.querySelector('.annedit').addEventListener('click', () => go('draw'));
+      item.querySelector('.anndel').addEventListener('click', () => {
+        annCount--; renderAnns();
+      });
+      list.appendChild(item);
+    }
+    pill.style.display = annCount > 0 ? 'grid' : 'none';
+    pill.textContent = annCount;
+    btn.textContent = annCount > 0 ? '＋ Thêm đường bi' : '✎ Vẽ đường bi';
+    hint.textContent = annCount > 0
+      ? 'Mỗi đường 1 màu + 1 khoảng hiện riêng.'
+      : 'Tua tới pha bóng đẹp → Vẽ đường bi → chọn lúc hiện.';
+    stage.style.display = annCount > 0 ? '' : 'none';
+    if (chips) chips.style.display = annCount > 0 ? '' : 'none';
+  }
+  renderAnns();
+  const addAnn = () => {
+    if (annCount < ANNS.length) annCount++;
+    renderAnns();
+    go('editor');
+  };
+  document.getElementById('btnDrawDone').addEventListener('click', addAnn);
+  document.getElementById('btnFsDone').addEventListener('click', addAnn);
 
   // FREE/PAID toggle → mờ preview khi Free
   const paid = document.getElementById('paidToggle');
