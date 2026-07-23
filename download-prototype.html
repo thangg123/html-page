@@ -132,6 +132,7 @@
   .phone[data-screen="done-popup"] #s-preview,
   .phone[data-screen="editor"] #s-editor,
   .phone[data-screen="draw"] #s-draw,
+  .phone[data-screen="draw-fs"] #s-drawfs,
   .phone[data-screen="share"] #s-share { opacity: 1; transform: scale(1); pointer-events: auto; }
 
   /* status bar */
@@ -325,7 +326,7 @@
   .addmore:hover { background: rgba(0,151,254,.16); }
 
   .rowbtns { display: flex; gap: 10px; margin-top: 10px; }
-  .rowbtns .b { flex: 1; padding: 14px; border-radius: 14px; font-family: var(--font); font-weight: 800; font-size: .95rem; cursor: pointer; border: none; }
+  .rowbtns .b, .fsactions .b { flex: 1; padding: 14px; border-radius: 14px; font-family: var(--font); font-weight: 800; font-size: .95rem; cursor: pointer; border: none; }
   .b.close { background: var(--card); color: var(--txt-2); border: 1px solid var(--line-soft); }
   .b.done { background: linear-gradient(180deg,var(--blue),var(--blue-press)); color: #fff; box-shadow: 0 12px 26px -12px var(--blue); }
 
@@ -378,6 +379,28 @@
   .ehint { color: rgba(255,255,255,.55); font-size: 12px; text-align: center; margin: 10px 0 4px; }
   .exportbtn { width: 100%; margin: 24px 0 10px; height: 48px; border-radius: 24px; border: none; background: #0097FE; color: #fff; font-family: var(--font); font-size: 15px; font-weight: 800; cursor: pointer; }
 
+  /* ── Vẽ fullscreen (content xoay 90° trong khung dọc — như app) ─────── */
+  .fstoggle { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; border-radius: 10px; border: 1px solid rgba(255,255,255,.25); background: rgba(0,0,0,.45); color: #fff; font-size: 16px; cursor: pointer; z-index: 5; display: grid; place-items: center; }
+  .fstoggle:hover { background: rgba(0,151,254,.4); }
+  /* khung xoay: rộng = cao màn (820) · cao = rộng màn (366), rotate 90° */
+  .fsrot { position: absolute; width: 820px; height: 366px; top: 227px; left: -227px; transform: rotate(90deg); display: flex; gap: 10px; padding: 12px; background: #000; }
+  .fsleft { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .fscanvas { position: relative; flex: 1; border-radius: 12px; overflow: hidden; background: radial-gradient(120% 90% at 70% 30%, #2a3b4d 0%, #101a24 55%, #070d14 100%); }
+  .fscanvas svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .fstl { flex: none; }
+  .track-sm { height: 44px; }
+  .track-sm .playhead::before { top: -14px; }
+  .fsside { width: 250px; flex: none; display: flex; flex-direction: column; }
+  .fstools { display: flex; gap: 6px; }
+  .fstools .tool { padding: 8px 2px; border-radius: 11px; }
+  .fstools .g { font-size: 1.05rem; }
+  .fstools .n { font-size: .58rem; }
+  .fsrow { display: flex; gap: 8px; justify-content: center; }
+  .fspill { padding: 8px 14px; border-radius: 999px; background: var(--card); border: 1px solid var(--ctrl-b); color: #eaf3ff; font-family: var(--font); font-size: .8rem; font-weight: 700; cursor: pointer; }
+  .fspill.blue { background: rgba(0,151,254,.16); border-color: rgba(0,151,254,.5); color: #8fd0ff; }
+  .fsactions { margin-top: auto; display: flex; gap: 8px; }
+  .fsactions .b { flex: 1; padding: 11px; border-radius: 12px; font-size: .85rem; }
+
   /* ── Màn Xuất & Chia sẻ ────────────────────────────────────────────── */
   .vidbadge { width: 100%; height: 92px; border-radius: 12px; background: #0a1424; border: 1px solid rgba(255,255,255,.12); display: grid; place-items: center; font-size: 2.2rem; margin-top: 12px; }
   .sharerow { display: flex; justify-content: space-around; margin: 18px 0 2px; }
@@ -403,7 +426,8 @@
     <button data-go="upgrade">4 · Popup Paid (Free)</button>
     <button data-go="editor">5 · Editor đường bi</button>
     <button data-go="draw">6 · Canvas vẽ</button>
-    <button data-go="share">7 · Xuất &amp; Chia sẻ</button>
+    <button data-go="draw-fs">7 · Vẽ fullscreen</button>
+    <button data-go="share">8 · Xuất &amp; Chia sẻ</button>
   </div>
 
   <div class="phone" id="phone" data-screen="preview">
@@ -610,6 +634,8 @@
             </g>
           </svg>
           <div class="ts">13:26:48 / 13:41</div>
+          <!-- ⛶ bật fullscreen landscape (màn to dễ vẽ) — như app -->
+          <button class="fstoggle" id="btnDrawFs" title="Fullscreen">⛶</button>
         </div>
 
         <div class="playpill">▶ Phát</div>
@@ -646,6 +672,62 @@
         <div class="rowbtns">
           <button class="b close" id="drawClose">Đóng</button>
           <button class="b done">Xong</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ MÀN VẼ FULLSCREEN (AnnotationEditor landscape) ══════════
+         Như app: giữ khung DỌC, xoay content 90° → cầm ngang máy là landscape.
+         Canvas TRÁI (+ timeline dưới) · cột công cụ PHẢI (tools/màu/Phát+Thêm/
+         chips) · Đóng/Xong cố định đáy cột. -->
+    <section class="screen" id="s-drawfs" style="background:#000">
+      <div class="fsrot">
+        <div class="fsleft">
+          <div class="fscanvas">
+            <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice">
+              <rect x="0" y="110" width="320" height="70" fill="#1a1712"/>
+              <g transform="translate(60 55) rotate(-8)">
+                <rect x="0" y="0" width="200" height="100" rx="12" fill="#aab0b4"/>
+                <circle cx="60" cy="60" r="6" fill="#fafafa"/>
+                <circle cx="150" cy="34" r="6" fill="#ffc700"/>
+                <path d="M60 60 Q 100 84 130 54 T 150 34" stroke="#00cd50" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                <circle cx="150" cy="34" r="10" fill="none" stroke="#00cd50" stroke-width="2" stroke-dasharray="3 3"/>
+              </g>
+            </svg>
+            <div class="ebadge etime" style="top:8px;left:8px">13:30:45 / 13:41</div>
+            <button class="fstoggle" id="btnDrawFsExit" title="Thu nhỏ">⛶</button>
+          </div>
+          <div class="fstl">
+            <div class="track track-sm" id="fsTrack"></div>
+          </div>
+        </div>
+        <div class="fsside">
+          <div class="fstools">
+            <div class="tool" data-on="1"><div class="g">⤳</div><div class="n">Đường bi</div></div>
+            <div class="tool"><div class="g">↗</div><div class="n">Mũi tên</div></div>
+            <div class="tool"><div class="g">✎</div><div class="n">Vẽ tay</div></div>
+            <div class="tool"><div class="g">◎</div><div class="n">Ghost</div></div>
+          </div>
+          <div class="colors" style="margin:10px 0">
+            <span class="sw" style="background:#ffffff;color:#ffffff"></span>
+            <span class="sw" style="background:#0097fe;color:#0097fe"></span>
+            <span class="sw" style="background:#e6171b;color:#e6171b"></span>
+            <span class="sw" style="background:#ffc700;color:#ffc700"></span>
+            <span class="sw" style="background:#00cd50;color:#00cd50" data-on="1"></span>
+          </div>
+          <div class="fsrow">
+            <button class="fspill">▶ Phát</button>
+            <button class="fspill blue">＋ Thêm đường</button>
+          </div>
+          <div class="chip" style="margin-top:10px">
+            <span class="dot" style="background:#00cd50"></span>
+            <div class="tx"><b>Đường bi 1</b><small>13:30:45 → 13:33 · xanh lá</small></div>
+            <span class="x">✕</span>
+          </div>
+          <div class="fsactions">
+            <button class="b close" id="fsClose">Đóng</button>
+            <button class="b done">Xong</button>
+          </div>
         </div>
       </div>
     </section>
@@ -776,12 +858,27 @@
   // Editor: playhead trong .etrim (clip 0:20) — cập nhật nhãn đỏ + badge giờ.
   const eHead = document.querySelector('.ephead');
   const eLbl = document.querySelector('.ephlbl');
-  const eTime = document.querySelector('.etime');
+  const eTime = document.querySelector('#s-editor .etime');
   dragPlayhead(document.querySelector('.etrim'), eHead, pct => {
     const t = fmtMS((20 * pct) / 100);
     if (eLbl) eLbl.textContent = t;
     if (eTime) eTime.textContent = `${t} / 0:20`;
   });
+
+  // ── Vẽ fullscreen: timeline + toggle ⛶ ────────────────────────────────
+  const fsPh = buildTrack(document.getElementById('fsTrack'), {
+    winStart: 8, winEnd: 34, play: { p: 12, t: '13:30:45' },
+    labels: [{ p: 8, t: '13:31' }, { p: 50, t: '13:36' }, { p: 90, t: '13:41' }],
+    markers: [{ s: 8, e: 34, c: '#00cd50' }]
+  });
+  dragPlayhead(document.getElementById('fsTrack'), fsPh, pct => {
+    const s = 13 * 3600 + 30 * 60, e = 13 * 3600 + 41 * 60;
+    fsPh.setAttribute('data-t', fmtHMS(s + ((e - s) * pct) / 100));
+  });
+  document.getElementById('btnDrawFs').addEventListener('click', () => go('draw-fs'));
+  document.getElementById('btnDrawFsExit').addEventListener('click', () => go('draw'));
+  document.getElementById('fsClose').addEventListener('click', () => go('draw'));
+  // chọn tool/màu trong fullscreen dùng chung handler .tool/.sw đã có
 
   // ── Chuyển màn ────────────────────────────────────────────────────────
   function go(screen) {
