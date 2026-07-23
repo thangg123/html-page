@@ -224,7 +224,8 @@
   .handle { position: absolute; top: 0; bottom: 0; width: 18px; background: var(--yellow); display: grid; place-items: center; color: #6a5400; font-weight: 800; font-size: .8rem; box-shadow: 0 2px 8px -2px rgba(0,0,0,.4); }
   .handle.l { border-radius: 6px 0 0 6px; }
   .handle.r { border-radius: 0 6px 6px 0; }
-  .playhead { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--red); z-index: 9; }
+  .playhead { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--red); z-index: 9; cursor: grab; touch-action: none; }
+  .playhead::after { content: ''; position: absolute; top: -10px; bottom: -10px; left: -12px; right: -12px; } /* vùng bắt kéo rộng */
   .playhead::before { content: attr(data-t); position: absolute; top: -18px; left: 50%; transform: translateX(-50%); background: var(--red); color: #fff; font: 800 9px/1 var(--font); padding: 3px 5px; border-radius: 4px; white-space: nowrap; }
   /* marker màu cho từng đường bi (editor) */
   .marker { position: absolute; height: 5px; border-radius: 3px; bottom: 3px; opacity: .95; }
@@ -359,7 +360,8 @@
   .ehandle { position: absolute; top: -5px; height: 56px; width: 16px; border-radius: 6px; background: #FFD400; z-index: 5; display: grid; place-items: center; box-shadow: 0 2px 8px -2px rgba(0,0,0,.4); }
   .ehandle i { width: 3px; height: 20px; border-radius: 1.5px; background: rgba(0,0,0,.5); }
   .ehlbl { position: absolute; top: -27px; left: 50%; transform: translateX(-50%); width: 60px; padding: 3px 0; border-radius: 7px; background: #FFD400; color: #111; font-size: 11px; font-weight: 800; text-align: center; }
-  .ephead { position: absolute; top: -7px; bottom: -7px; width: 2.5px; margin-left: -1.25px; border-radius: 2px; background: #ff393b; z-index: 9; }
+  .ephead { position: absolute; top: -7px; bottom: -7px; width: 2.5px; margin-left: -1.25px; border-radius: 2px; background: #ff393b; z-index: 9; cursor: grab; touch-action: none; }
+  .ephead::after { content: ''; position: absolute; top: -8px; bottom: -8px; left: -12px; right: -12px; } /* vùng bắt kéo rộng */
   .edot2 { position: absolute; top: -5px; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; border-radius: 5px; background: #ff393b; border: 1.5px solid #fff; }
   .ephlbl { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 38px; padding: 2px 0; border-radius: 6px; background: #ff393b; color: #fff; font-size: 10px; font-weight: 800; text-align: center; z-index: 7; }
   /* đường bi items */
@@ -716,17 +718,69 @@
     el.appendChild(hl); el.appendChild(hr);
     const ph = document.createElement('div'); ph.className = 'playhead'; ph.style.left = play.p + '%'; ph.setAttribute('data-t', play.t);
     el.appendChild(ph);
+    return ph;
   }
 
-  buildTrack(document.getElementById('trimTrack'), {
+  // ── Kéo playhead đỏ (chuột + cảm ứng) ─────────────────────────────────
+  // container = track; head = thanh đỏ; onPct(pct) cập nhật nhãn giờ.
+  function dragPlayhead(container, head, onPct) {
+    if (!container || !head) return;
+    const apply = ev => {
+      const r = container.getBoundingClientRect();
+      let pct = ((ev.clientX - r.left) / r.width) * 100;
+      pct = Math.max(0, Math.min(100, pct));
+      head.style.left = pct + '%';
+      onPct?.(pct);
+    };
+    head.addEventListener('pointerdown', e => {
+      e.preventDefault(); e.stopPropagation();
+      head.style.cursor = 'grabbing';
+      const move = ev => apply(ev);
+      const up = () => {
+        head.style.cursor = 'grab';
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', up);
+      };
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', up);
+      apply(e);
+    });
+  }
+  const fmtMS = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  const fmtHMS = s => {
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), ss = Math.floor(s % 60);
+    return `${h}:${String(m).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
+  };
+
+  const trimPh = buildTrack(document.getElementById('trimTrack'), {
     winStart: 18, winEnd: 60, play: { p: 22, t: '13:28:36' },
     labels: [{ p: 20, t: '13:26' }, { p: 62, t: '13:30' }, { p: 90, t: '13:41' }]
   });
   // (editor dùng markup .etrim tĩnh — đúng thông số VideoEditScreen thật)
-  buildTrack(document.getElementById('drawTrack'), {
+  const drawPh = buildTrack(document.getElementById('drawTrack'), {
     winStart: 8, winEnd: 34, play: { p: 12, t: '13:30:45' },
     labels: [{ p: 8, t: '13:31' }, { p: 50, t: '13:36' }, { p: 90, t: '13:41' }],
     markers: [{ s: 8, e: 34, c: '#00cd50' }]
+  });
+
+  // Playhead đỏ KÉO ĐƯỢC (như app) — nhãn giờ chạy theo vị trí.
+  // trimTrack: 13:26:00 → 13:41:00 · drawTrack: 13:30:00 → 13:41:00.
+  dragPlayhead(document.getElementById('trimTrack'), trimPh, pct => {
+    const s = 13 * 3600 + 26 * 60, e = 13 * 3600 + 41 * 60;
+    trimPh.setAttribute('data-t', fmtHMS(s + ((e - s) * pct) / 100));
+  });
+  dragPlayhead(document.getElementById('drawTrack'), drawPh, pct => {
+    const s = 13 * 3600 + 30 * 60, e = 13 * 3600 + 41 * 60;
+    drawPh.setAttribute('data-t', fmtHMS(s + ((e - s) * pct) / 100));
+  });
+  // Editor: playhead trong .etrim (clip 0:20) — cập nhật nhãn đỏ + badge giờ.
+  const eHead = document.querySelector('.ephead');
+  const eLbl = document.querySelector('.ephlbl');
+  const eTime = document.querySelector('.etime');
+  dragPlayhead(document.querySelector('.etrim'), eHead, pct => {
+    const t = fmtMS((20 * pct) / 100);
+    if (eLbl) eLbl.textContent = t;
+    if (eTime) eTime.textContent = `${t} / 0:20`;
   });
 
   // ── Chuyển màn ────────────────────────────────────────────────────────
