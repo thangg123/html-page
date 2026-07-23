@@ -1,246 +1,724 @@
-<!-- @dsCard group="Prototype" -->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tải video — Prototype bấm được</title>
+<title>Arena · Download + Vẽ đường bi — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
-  :root{--bg:#0E1A32;--bg2:#0a1324;--blue:#0097FE;--red:#ff393b;--yellow:#FFEA00;--amber:#FFC107;--btn:#18315c;--line:rgba(147,211,255,.35);--grey:#B4B4B4}
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  body{font-family:-apple-system,'Segoe UI',Roboto,system-ui,sans-serif;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:16px;padding:34px 20px;
-    background:radial-gradient(900px 500px at 50% -8%,rgba(0,151,254,.08),transparent 60%),linear-gradient(180deg,#0c1626,#05080f)}
-  .cap{text-align:center}.cap .e{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--blue);font-weight:700}
-  .cap h1{font-size:20px;font-weight:800;margin-top:6px}
-  .phone{width:390px;border-radius:42px;padding:11px;background:linear-gradient(160deg,#1b2740,#0a0f1a);box-shadow:0 40px 90px -30px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.05);position:relative}
-  .screen{border-radius:32px;overflow:hidden;background:var(--bg);position:relative;display:flex;flex-direction:column;min-height:720px}
-  .sb{display:flex;justify-content:space-between;align-items:center;padding:11px 20px 4px;font-size:13px;font-weight:600}
-  .sb .r{color:rgba(255,255,255,.5);letter-spacing:1px;font-size:12px}
-  .head{display:flex;align-items:center;gap:12px;padding:8px 16px 12px}
-  .head .bk{width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;cursor:pointer}
-  .head .tt{font-weight:800;font-size:17px}
-  .hline{height:1px;background:var(--line);margin:0 16px 12px}
-  .stage{position:relative;margin:0 16px;border-radius:14px;overflow:hidden;aspect-ratio:16/10;background:radial-gradient(120% 90% at 60% 30%,#2b3446,#0d1017 78%);border:1px solid rgba(255,255,255,.1)}
-  .felt{position:absolute;left:8%;right:6%;top:32%;bottom:12%;border-radius:60px/40px;transform:rotate(-7deg);background:radial-gradient(120% 120% at 40% 30%,#3f4b5e,#20283a);border:7px solid #10141d;box-shadow:inset 0 0 50px rgba(0,0,0,.5)}
-  .ball{position:absolute;width:13px;height:13px;border-radius:50%;box-shadow:inset -2px -2px 4px rgba(0,0,0,.4)}
-  .stamp{position:absolute;top:9px;right:11px;font-variant-numeric:tabular-nums;font-size:11px;color:rgba(255,255,255,.82);text-shadow:0 1px 3px #000}
-  .wm{position:absolute;right:11px;bottom:8px;font-weight:800;font-size:11px;color:rgba(255,255,255,.62);letter-spacing:.08em}
-  .paid{margin-left:auto;font-weight:800;font-size:12px;padding:6px 12px;border-radius:999px;cursor:pointer;border:1px solid var(--amber);color:#FFD54A;background:rgba(255,199,0,.14);user-select:none}
-  .paid.free{color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.06)}
-  .stage.free .felt{filter:blur(6px) brightness(.82)}
-  .freeveil{position:absolute;inset:0;display:none;align-items:center;justify-content:center;gap:6px;color:#fff;font-weight:800;font-size:12.5px;background:rgba(4,8,16,.32);z-index:3}
-  .stage.free .freeveil{display:flex}
-  .guide{color:#D9D9D9;font-size:13.5px;text-align:center;margin:14px 16px 0}.guide b{font-weight:800}
-  .cutdur{color:#fff;font-weight:800;font-size:14px;text-align:center;margin:16px 0 6px;font-variant-numeric:tabular-nums}
-  .cutdur.over{color:var(--red)}
-  /* ── Cut slider ── */
-  .cut{margin:0 16px;position:relative;height:88px;user-select:none;touch-action:none}
-  .ruler{position:absolute;left:0;right:0;top:26px;height:50px;background:var(--grey);border-radius:6px;overflow:hidden}
-  .rtk{position:absolute;bottom:8px;width:1px;background:#5f6b7a}
-  .rlab{position:absolute;top:6px;font-size:10px;font-weight:800;color:#0a0a0a;font-variant-numeric:tabular-nums}
-  .sel{position:absolute;top:26px;height:50px;border:3px solid var(--yellow);border-radius:5px;box-sizing:border-box;z-index:3}
-  .hnd{position:absolute;top:2px;height:44px;width:20px;background:var(--yellow);display:flex;align-items:center;justify-content:center;color:#111;font-size:14px;font-weight:900;cursor:ew-resize;z-index:4}
-  .hnd.l{left:-3px;border-radius:5px 0 0 5px}.hnd.r{right:-3px;border-radius:0 5px 5px 0}
-  .playhead{position:absolute;top:26px;height:50px;width:3px;background:red;margin-left:-1px;z-index:5}
-  .slab{position:absolute;top:0;transform:translateX(-50%);background:#fff;color:#000;font-size:11px;font-weight:800;font-variant-numeric:tabular-nums;padding:2px 6px;border-radius:6px;z-index:6;white-space:nowrap}
-  .controls{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 16px 2px;position:relative}
-  .controls.locked{opacity:.42}
-  .pb{background:var(--btn);width:66px;height:38px;border-radius:20px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-  .cb{background:var(--btn);height:38px;min-width:44px;padding:0 10px;border-radius:20px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;cursor:pointer;gap:2px}
-  .cb span{font-size:11px}
-  .lockchip{position:absolute;right:16px;top:-8px;font-size:10px;font-weight:800;color:#FFD54A;background:rgba(255,199,0,.15);border:1px solid var(--amber);padding:3px 8px;border-radius:999px;display:none}
-  .controls.locked .lockchip{display:block}
-  .dlwrap{padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px}
-  .dlbtn{width:300px;height:44px;border-radius:22px;background:var(--red);display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:800;font-size:15px;color:#fff;letter-spacing:.04em}
-  .dlbtn.dis{background:var(--grey);cursor:default;color:rgba(0,0,0,.5)}
-  .dlbtn .sp{width:22px;height:22px;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin-left:10px}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .cancel{border:1px solid var(--red);color:var(--red);font-weight:700;font-size:13px;padding:8px 22px;border-radius:20px;cursor:pointer;display:none}
-  .cancel.on{display:block}
-  .stall{color:var(--amber);font-size:12.5px;text-align:center;display:none}.stall.on{display:block}
-  .freeNote{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:#8fd0ff;background:rgba(0,151,254,.14);border:1px solid rgba(0,151,254,.4);padding:4px 11px;border-radius:999px}
-  .home{width:118px;height:5px;border-radius:3px;background:rgba(255,255,255,.4);margin:14px auto 8px}
-  .modal{display:none;position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:80;align-items:center;justify-content:center;padding:24px}.modal.on{display:flex}
-  .mcard{width:100%;max-width:300px;background:#0d1b34;border-radius:20px;padding:22px;border:1px solid rgba(255,255,255,.16);text-align:center}
-  .mcard .ico{font-size:40px}.mcard h2{font-size:17px;font-weight:800;margin:8px 0 4px}.mcard p{color:rgba(255,255,255,.62);font-size:13px}
-  .mbtn{margin-top:16px;display:block;width:100%;padding:11px;border-radius:12px;background:var(--blue);color:#fff;font-weight:800;font-size:14px;border:none;cursor:pointer}
-  .mbtn.g{background:rgba(255,255,255,.1)}
-  .row2{display:flex;gap:10px;margin-top:16px}.row2 .mbtn{margin-top:0}
-  .toast{position:absolute;left:50%;bottom:96px;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;font-size:13px;font-weight:600;padding:9px 16px;border-radius:12px;z-index:200;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}.toast.on{opacity:1}
+  /* ── Design tokens THẬT của Arena (dark + blue #0097fe) ─────────────── */
+  :root {
+    --bg: #0a1626;
+    --bg-2: #0d1c30;
+    --card: #12253d;
+    --card-2: #17304d;
+    --line: rgba(147, 211, 255, 0.28);
+    --line-soft: rgba(147, 211, 255, 0.14);
+
+    --blue: #0097fe;
+    --blue-press: #0079ce;
+    --red: #ff3b30;
+    --red-soft: rgba(255, 59, 48, 0.14);
+    --yellow: #ffd60a;
+    --green: #00cd50;
+
+    --txt: #ffffff;
+    --txt-2: #9fb2c8;
+    --txt-3: #64768c;
+
+    --gold: #d8b24a;
+
+    --ctrl: #16294294;
+    --ctrl-b: rgba(147, 211, 255, 0.22);
+
+    --radius: 18px;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --font: 'Averta', 'Inter', -apple-system, 'SF Pro Display', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: var(--font);
+    background:
+      radial-gradient(1200px 700px at 80% -10%, #123457 0%, transparent 60%),
+      radial-gradient(900px 600px at -10% 110%, #0e2740 0%, transparent 55%),
+      #050d18;
+    color: var(--txt);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 26px;
+    padding: 40px 16px 80px;
+  }
+
+  .head {
+    text-align: center;
+    max-width: 640px;
+  }
+  .head h1 {
+    font-size: clamp(1.4rem, 1rem + 2vw, 2.1rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(90deg, #eaf4ff, var(--blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .head p { color: var(--txt-2); margin-top: 8px; font-size: 0.9rem; }
+
+  /* ── Chuyển màn ────────────────────────────────────────────────────── */
+  .switcher {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    max-width: 720px;
+  }
+  .switcher button {
+    font-family: var(--font);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--txt-2);
+    background: var(--card);
+    border: 1px solid var(--line-soft);
+    padding: 9px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.18s var(--ease), background 0.18s, color 0.18s, border-color 0.18s;
+  }
+  .switcher button:hover { transform: translateY(-2px); border-color: var(--line); }
+  .switcher button[aria-current="true"] {
+    background: linear-gradient(180deg, var(--blue), var(--blue-press));
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 8px 22px -8px var(--blue);
+  }
+
+  /* ── Khung điện thoại ──────────────────────────────────────────────── */
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg);
+    border-radius: 46px;
+    padding: 12px;
+    box-shadow:
+      0 0 0 12px #0a141f,
+      0 0 0 13px #223a55,
+      0 42px 90px -30px rgba(0, 0, 0, 0.9),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    position: relative;
+    overflow: hidden;
+  }
+  .screen {
+    position: absolute;
+    inset: 12px;
+    border-radius: 36px;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--bg-2), var(--bg));
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: scale(1.02);
+    pointer-events: none;
+    transition: opacity 0.32s var(--ease), transform 0.32s var(--ease);
+  }
+  .phone[data-screen="preview"] #s-preview,
+  .phone[data-screen="downloading"] #s-preview,
+  .phone[data-screen="upgrade"] #s-preview,
+  .phone[data-screen="done-popup"] #s-preview,
+  .phone[data-screen="editor"] #s-editor,
+  .phone[data-screen="draw"] #s-draw,
+  .phone[data-screen="share"] #s-share { opacity: 1; transform: scale(1); pointer-events: auto; }
+
+  /* status bar */
+  .statusbar {
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 26px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    flex: none;
+  }
+  .statusbar .icons { display: flex; gap: 7px; align-items: center; opacity: 0.95; }
+  .statusbar .icons span { display: inline-block; }
+  .sig { width: 17px; height: 11px; background:
+      linear-gradient(90deg,#fff 0 20%, transparent 20% 25%, #fff 25% 45%, transparent 45% 50%, #fff 50% 72%, transparent 72% 77%, #fff 77%);
+      -webkit-mask: linear-gradient(#000,#000); }
+  .batt { width: 24px; height: 12px; border: 1.5px solid rgba(255,255,255,.6); border-radius: 3px; position: relative; }
+  .batt::before { content:""; position:absolute; inset:1.5px; width: 70%; background:#fff; border-radius:1px; }
+  .batt::after { content:""; position:absolute; right:-3px; top:3px; width:2px; height:6px; background:rgba(255,255,255,.6); border-radius:1px; }
+
+  /* header */
+  .apphead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 18px 14px;
+    border-bottom: 1px solid var(--line);
+    flex: none;
+  }
+  .apphead .l { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .back { width: 30px; height: 30px; display: grid; place-items: center; color: #cfe0f2; font-size: 1.5rem; }
+  .apphead h2 { font-size: 1.12rem; font-weight: 800; letter-spacing: -0.01em; white-space: nowrap; }
+  .paidbtn {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 0.82rem; font-weight: 800;
+    padding: 7px 15px; border-radius: 16px;
+    border: 1.4px solid var(--gold);
+    color: #f4e3b0;
+    background: linear-gradient(180deg, rgba(216,178,74,.16), rgba(216,178,74,.04));
+    cursor: pointer;
+  }
+
+  .body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 14px 14px 18px; }
+  .body::-webkit-scrollbar { width: 0; }
+
+  /* ── Video preview (khung CCTV + bàn bida) ─────────────────────────── */
+  .video {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    background:
+      radial-gradient(120% 90% at 70% 30%, #2a3b4d 0%, #101a24 55%, #070d14 100%);
+    box-shadow: 0 12px 34px -18px #000, inset 0 0 0 1px rgba(255,255,255,.05);
+    flex: none;
+  }
+  .video svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ts { position: absolute; top: 8px; left: 10px; font: 700 11px/1 'Courier New', monospace; color: #d7ff59; text-shadow: 0 1px 2px #000; letter-spacing: .5px; }
+  .cam { position: absolute; bottom: 8px; right: 10px; font: 700 10px/1 'Courier New', monospace; color: #cfd8e3; opacity: .8; text-shadow: 0 1px 2px #000; }
+  .video.blur svg { filter: blur(7px); }
+  .video.blur::after {
+    content: "🔒 FREE · xem mờ"; position: absolute; inset: 0; display: grid; place-items: center;
+    font-family: var(--font); font-weight: 800; font-size: .82rem; color: #dfeafc; letter-spacing:.3px;
+    background: rgba(6,14,24,.28);
+  }
+
+  .capnote { text-align: center; color: #dbe7f5; font-weight: 700; font-size: .92rem; margin: 14px 0 5px; }
+  .capsel { text-align: center; color: var(--txt-2); font-size: .84rem; margin-bottom: 12px; }
+
+  /* ── Timeline trim (trắng · ruler · vàng · playhead đỏ) ────────────── */
+  .timepills { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 2px 6px; }
+  .pill { background: rgba(255,255,255,.13); color: #dfe8f2; font-size: .68rem; font-weight: 700; padding: 3px 7px; border-radius: 6px; }
+  .pill.now { background: var(--red); color: #fff; box-shadow: 0 4px 12px -4px var(--red); }
+
+  .track {
+    position: relative;
+    height: 62px;
+    background: linear-gradient(180deg,#ffffff,#eef2f6);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.06), 0 6px 16px -10px #000;
+  }
+  .ruler { position: absolute; inset: 0; }
+  .ruler i { position: absolute; top: 0; width: 1px; background: #c3ccd6; }
+  .ruler i.maj { background: #8b97a4; }
+  .ruler b { position: absolute; bottom: 5px; font: 700 9px/1 var(--font); color: #7c8794; transform: translateX(-50%); }
+  .window { position: absolute; top: 0; bottom: 0; background: rgba(255,214,10,.22); border-left: 3px solid var(--yellow); border-right: 3px solid var(--yellow); }
+  .handle { position: absolute; top: 0; bottom: 0; width: 18px; background: var(--yellow); display: grid; place-items: center; color: #6a5400; font-weight: 800; font-size: .8rem; box-shadow: 0 2px 8px -2px rgba(0,0,0,.4); }
+  .handle.l { border-radius: 6px 0 0 6px; }
+  .handle.r { border-radius: 0 6px 6px 0; }
+  .playhead { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--red); z-index: 9; }
+  .playhead::before { content: attr(data-t); position: absolute; top: -18px; left: 50%; transform: translateX(-50%); background: var(--red); color: #fff; font: 800 9px/1 var(--font); padding: 3px 5px; border-radius: 4px; white-space: nowrap; }
+  /* marker màu cho từng đường bi (editor) */
+  .marker { position: absolute; height: 5px; border-radius: 3px; bottom: 3px; opacity: .95; }
+
+  /* ── Cụm nút điều khiển ────────────────────────────────────────────── */
+  .controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 18px 0 8px; }
+  .cbtn {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--ctrl); border: 1px solid var(--ctrl-b);
+    display: grid; place-items: center; color: #eaf3ff; cursor: pointer;
+    transition: transform .18s var(--ease), background .18s;
+    font-size: 1.15rem;
+  }
+  .cbtn:hover { transform: translateY(-2px); background: #1d3757; }
+  .cbtn:active { transform: scale(.92); }
+  .cbtn.play { width: 62px; height: 62px; background: linear-gradient(180deg,#1c3557,#16294a); }
+  .cbtn.play span { margin-left: 3px; font-size: 1.4rem; }
+
+  /* nút chính */
+  .primary {
+    margin: 16px 4px 6px; padding: 17px; border-radius: 16px; border: none;
+    font-family: var(--font); font-weight: 800; font-size: 1.02rem; letter-spacing: .3px;
+    cursor: pointer; color: #fff;
+    background: linear-gradient(180deg,#ff5147,var(--red));
+    box-shadow: 0 14px 30px -12px var(--red);
+    transition: transform .18s var(--ease), box-shadow .18s;
+  }
+  .primary:hover { transform: translateY(-2px); }
+  .primary:active { transform: scale(.98); }
+  .foot { text-align: center; color: var(--txt-3); font-size: .8rem; margin-top: 8px; }
+  .foot b { color: var(--blue); font-weight: 700; }
+
+  /* ── Trạng thái đang tải ───────────────────────────────────────────── */
+  .progwrap { margin: 20px 6px 6px; }
+  .progbar { height: 46px; border-radius: 14px; background: rgba(255,255,255,.08); overflow: hidden; position: relative; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); }
+  .progbar i { position: absolute; inset: 0; width: var(--p,38%); background: linear-gradient(90deg,#7fd0ff,var(--blue)); border-radius: 14px; transition: width .5s var(--ease); }
+  .progbar span { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 800; color: #eaf5ff; font-size: .95rem; letter-spacing: .5px; }
+  .spin { display: inline-block; width: 14px; height: 14px; margin-left: 8px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: sp .7s linear infinite; vertical-align: -2px; }
+  @keyframes sp { to { transform: rotate(360deg); } }
+  .cancel { margin: 16px auto 0; display: block; padding: 11px 34px; border-radius: 999px; background: transparent; border: 1.5px solid var(--red); color: #ff6b62; font-family: var(--font); font-weight: 700; font-size: .92rem; cursor: pointer; }
+  .cancel:hover { background: var(--red-soft); }
+
+  /* ── Overlay (Alert + Popup) ───────────────────────────────────────── */
+  .overlay { position: absolute; inset: 12px; border-radius: 36px; background: rgba(4,10,18,.62); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; padding: 26px; z-index: 20; }
+  .phone[data-screen="done-popup"] #ov-popup { display: flex; }
+  .phone[data-screen="upgrade"] #ov-upgrade { display: flex; }
+  .modal { width: 100%; border-radius: 22px; background: linear-gradient(180deg,var(--card-2),var(--card)); border: 1px solid var(--line); box-shadow: 0 30px 70px -20px #000; padding: 26px 22px; text-align: center; animation: pop .35s var(--ease); }
+  @keyframes pop { from { opacity: 0; transform: scale(.9) translateY(8px); } }
+  .modal .ic { font-size: 2.4rem; }
+  .modal h3 { font-size: 1.22rem; font-weight: 800; margin: 8px 0 4px; }
+  .modal p { color: var(--txt-2); font-size: .92rem; margin-bottom: 18px; }
+  .modal .go {
+    width: 100%; padding: 15px; border: none; border-radius: 14px; cursor: pointer;
+    font-family: var(--font); font-weight: 800; font-size: 1rem; color: #fff;
+    background: linear-gradient(180deg,var(--blue),var(--blue-press));
+    box-shadow: 0 12px 26px -10px var(--blue);
+  }
+  .modal .ghost { margin-top: 10px; background: none; border: none; color: var(--txt-2); font-family: var(--font); font-weight: 600; font-size: .95rem; cursor: pointer; padding: 8px; width: 100%; }
+  /* alert kiểu OS */
+  .osalert { width: 84%; border-radius: 16px; background: #22303f; overflow: hidden; text-align: center; box-shadow: 0 30px 70px -20px #000; animation: pop .3s var(--ease); }
+  .osalert .t { padding: 20px 18px 6px; font-weight: 800; font-size: 1.05rem; }
+  .osalert .m { padding: 0 18px 18px; color: #c6d2df; font-size: .9rem; }
+  .osalert .ok { border-top: 1px solid rgba(255,255,255,.12); padding: 14px; color: #3aa0ff; font-weight: 800; cursor: pointer; }
+
+  /* ── Editor (VideoEditScreen) ──────────────────────────────────────── */
+  .tools { display: flex; gap: 8px; margin: 14px 0 4px; }
+  .tool { flex: 1; padding: 11px 4px; border-radius: 13px; background: var(--card); border: 1px solid var(--line-soft); text-align: center; cursor: pointer; transition: .18s var(--ease); }
+  .tool:hover { transform: translateY(-2px); }
+  .tool[data-on="1"] { background: linear-gradient(180deg,rgba(0,151,254,.22),rgba(0,151,254,.06)); border-color: var(--blue); }
+  .tool .g { font-size: 1.25rem; }
+  .tool .n { font-size: .68rem; color: var(--txt-2); margin-top: 3px; font-weight: 600; }
+  .tool[data-on="1"] .n { color: #bfe2ff; }
+
+  .colors { display: flex; gap: 12px; justify-content: center; margin: 14px 0 6px; }
+  .sw { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,.18); transition: transform .16s var(--ease); }
+  .sw:hover { transform: scale(1.12); }
+  .sw[data-on="1"] { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px currentColor; }
+
+  .chips { margin: 8px 0; }
+  .chips .lbl { font-size: .78rem; color: var(--txt-3); margin-bottom: 8px; }
+  .chip { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 12px; background: var(--card); border: 1px solid var(--line-soft); margin-bottom: 8px; }
+  .chip .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+  .chip .tx { flex: 1; }
+  .chip .tx b { font-size: .86rem; }
+  .chip .tx small { display: block; color: var(--txt-3); font-size: .72rem; margin-top: 1px; }
+  .chip .x { color: var(--txt-3); font-size: 1.1rem; padding: 4px; cursor: pointer; }
+
+  .addmore { width: 100%; padding: 13px; border-radius: 13px; background: rgba(0,151,254,.1); border: 1.4px dashed var(--blue); color: #7fc8ff; font-family: var(--font); font-weight: 700; font-size: .92rem; cursor: pointer; margin: 6px 0; }
+  .addmore:hover { background: rgba(0,151,254,.16); }
+
+  .rowbtns { display: flex; gap: 10px; margin-top: 10px; }
+  .rowbtns .b { flex: 1; padding: 14px; border-radius: 14px; font-family: var(--font); font-weight: 800; font-size: .95rem; cursor: pointer; border: none; }
+  .b.close { background: var(--card); color: var(--txt-2); border: 1px solid var(--line-soft); }
+  .b.done { background: linear-gradient(180deg,var(--blue),var(--blue-press)); color: #fff; box-shadow: 0 12px 26px -12px var(--blue); }
+
+  .playpill { display: inline-flex; align-items: center; gap: 7px; align-self: center; padding: 9px 22px; border-radius: 999px; background: var(--card); border: 1px solid var(--ctrl-b); color: #eaf3ff; font-weight: 700; font-size: .9rem; margin: 10px 0 4px; cursor: pointer; }
+
+  .tag { display: inline-block; font-size: .66rem; font-weight: 800; letter-spacing: .4px; padding: 3px 9px; border-radius: 6px; text-transform: uppercase; }
+  .tag.new { background: rgba(0,205,80,.16); color: #4be089; }
+
+  .hint { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--line); color: var(--txt-2); font-size: .82rem; padding: 10px 18px; border-radius: 999px; box-shadow: 0 14px 30px -14px #000; }
+  .hint b { color: var(--blue); }
+
+  /* ── Màn Xuất & Chia sẻ ────────────────────────────────────────────── */
+  .vidbadge { width: 100%; height: 92px; border-radius: 12px; background: #0a1424; border: 1px solid rgba(255,255,255,.12); display: grid; place-items: center; font-size: 2.2rem; margin-top: 12px; }
+  .sharerow { display: flex; justify-content: space-around; margin: 18px 0 2px; }
+  .shareitem { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: transform .16s var(--ease); }
+  .shareitem:hover { transform: translateY(-3px); }
+  .shareitem small { color: rgba(255,255,255,.85); font-size: .74rem; font-weight: 600; }
+  .shareic { width: 50px; height: 50px; border-radius: 25px; display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 1.35rem; }
+  .arenago { margin-top: 18px; display: flex; align-items: center; justify-content: center; gap: 9px; }
+  .amark { width: 22px; height: 22px; border-radius: 11px; background: rgba(255,255,255,.22); display: grid; place-items: center; font-size: .8rem; font-weight: 900; }
 </style>
 </head>
 <body>
-  <div class="cap"><div class="e">Prototype</div><h1>Tải video (cắt đoạn)</h1></div>
 
-  <div class="phone"><div class="screen" id="screen">
-    <div class="sb"><span>15:12</span><span class="r">••• 📶 66</span></div>
-    <div class="head"><div class="bk" id="back">‹</div><div class="tt">Lab Pool B1</div><div class="paid" id="paidBtn">👑 PAID</div></div>
-    <div class="hline"></div>
+  <div class="head">
+    <h1>Arena · Tải &amp; Vẽ đường bi</h1>
+    <p>Prototype theo đúng luồng đã code (Paid) — chạm các nút để đi qua từng bước</p>
+  </div>
 
-    <div class="stage" id="stage">
-      <div class="stamp" id="stamp">12‑07‑2026 · 05:50:00</div>
-      <div class="felt">
-        <div class="ball" style="left:30%;top:44%;background:radial-gradient(circle at 35% 30%,#fff,#c7cdd6)"></div>
-        <div class="ball" style="left:52%;top:40%;background:radial-gradient(circle at 35% 30%,#ffd34d,#c98a00)"></div>
-        <div class="ball" style="left:44%;top:58%;background:radial-gradient(circle at 35% 30%,#ff6b6b,#a11)"></div>
+  <div class="switcher" id="switcher">
+    <button data-go="preview" aria-current="true">1 · Preview + Cắt</button>
+    <button data-go="downloading">2 · Đang tải</button>
+    <button data-go="done-popup">3 · Đã tải xong</button>
+    <button data-go="upgrade">4 · Popup Paid (Free)</button>
+    <button data-go="editor">5 · Editor đường bi</button>
+    <button data-go="draw">6 · Canvas vẽ</button>
+    <button data-go="share">7 · Xuất &amp; Chia sẻ</button>
+  </div>
+
+  <div class="phone" id="phone" data-screen="preview">
+
+    <!-- ══════════ MÀN DOWNLOAD (preview / downloading / overlays) ══════════ -->
+    <section class="screen" id="s-preview">
+      <div class="statusbar">
+        <span>1:34</span>
+        <span class="icons"><span class="sig"></span><span>📶</span><span class="batt"></span></span>
       </div>
-      <div class="wm">✦ ARENA</div>
-      <div class="freeveil">👑 Gói Free — xem mờ. Nâng cấp để nét</div>
-    </div>
-
-    <div class="guide">Bạn chỉ được cắt tối đa <b>10 phút</b>.</div>
-    <div class="cutdur" id="cutDur">Đã chọn: 2 phút 0 giây</div>
-
-    <div class="cut" id="cut">
-      <div class="ruler" id="ruler"></div>
-      <div class="playhead" id="playhead"></div>
-      <div class="sel" id="sel">
-        <div class="hnd l" id="hL">‹</div>
-        <div class="hnd r" id="hR">›</div>
+      <div class="apphead">
+        <div class="l"><span class="back">‹</span><h2>Lab Pool B1</h2></div>
+        <button class="paidbtn" id="paidToggle">👑 PAID</button>
       </div>
-      <div class="slab" id="labL">05:50:00</div>
-      <div class="slab" id="labR">05:52:00</div>
-    </div>
 
-    <div class="controls" id="controls">
-      <div class="cb" id="rw"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="#fff" d="M11 5V1L6 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H3c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg><span>5</span></div>
-      <div class="pb" id="pauseBtn"><svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg></div>
-      <div class="cb" id="fw"><span>5</span><svg width="20" height="20" viewBox="0 0 24 24"><path fill="#fff" d="M13 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h3c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/></svg></div>
-      <div class="cb" id="fsBtn"><svg width="19" height="19" viewBox="0 0 24 24"><path fill="#fff" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></div>
-      <div class="lockchip">👑 Paid</div>
-    </div>
+      <div class="body">
+        <div class="video" id="videoPrev">
+          <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <radialGradient id="felt" cx="50%" cy="40%" r="70%">
+                <stop offset="0%" stop-color="#c8cdd0"/><stop offset="100%" stop-color="#9aa1a6"/>
+              </radialGradient>
+              <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#2c2620"/><stop offset="100%" stop-color="#1a1712"/>
+              </linearGradient>
+            </defs>
+            <rect x="0" y="120" width="320" height="80" fill="url(#floor)"/>
+            <g transform="translate(60 70) rotate(-8)">
+              <rect x="-8" y="-8" width="216" height="116" rx="16" fill="#3a2a1c"/>
+              <rect x="0" y="0" width="200" height="100" rx="12" fill="url(#felt)"/>
+              <circle cx="10" cy="10" r="7" fill="#14100c"/><circle cx="100" cy="6" r="7" fill="#14100c"/><circle cx="190" cy="10" r="7" fill="#14100c"/>
+              <circle cx="10" cy="90" r="7" fill="#14100c"/><circle cx="100" cy="94" r="7" fill="#14100c"/><circle cx="190" cy="90" r="7" fill="#14100c"/>
+              <circle cx="70" cy="52" r="5" fill="#fafafa"/><circle cx="120" cy="46" r="5" fill="#e6171b"/><circle cx="132" cy="56" r="5" fill="#ffc700"/>
+            </g>
+            <rect x="230" y="20" width="80" height="150" rx="4" fill="#10161d" opacity=".55"/>
+          </svg>
+          <div class="ts">22-07-2026 Wed 13:23:08</div>
+          <div class="cam">Ikon 1</div>
+        </div>
 
-    <div class="dlwrap">
-      <div class="dlbtn" id="dlBtn">DOWNLOAD</div>
-      <div class="cancel" id="cancel">Huỷ tải</div>
-      <div class="stall" id="stall">Đang chờ hệ thống phản hồi... (có thể mất thêm ít phút)</div>
-      <div class="guide" style="margin-top:2px">Xem trong [<b>Thư viện ảnh</b>] sau khi tải video thành công</div>
-      <div class="freeNote" id="freeNote">🔓 Free vẫn tải được — không cần Paid</div>
-    </div>
-    <div class="home"></div>
+        <div class="capnote">Bạn chỉ được cắt tối đa 10 phút.</div>
+        <div class="capsel">Đã chọn: <b id="selDur">3 phút 38 giây</b></div>
 
-    <div class="modal" id="okModal"><div class="mcard"><div class="ico">✅</div><h2>Đã tải xong</h2>
-      <p id="okMsg">Video đã được lưu vào thư viện.</p>
-      <button class="mbtn" id="okClose">Xem thư viện</button>
-      <div class="row2" id="okEditRow" style="display:none"><button class="mbtn g" id="okCloseP">Đóng</button><button class="mbtn" id="okEdit">✏️ Chỉnh sửa</button></div>
-    </div></div>
-    <div class="modal" id="backModal"><div class="mcard"><div class="ico">⚠️</div><h2>Đang tải video</h2><p>Quay lại sẽ huỷ download. Bạn chắc chứ?</p><div class="row2"><button class="mbtn g" id="backStay">Tiếp tục tải</button><button class="mbtn" id="backGo" style="background:var(--red)">Huỷ & quay lại</button></div></div></div>
-    <div class="toast" id="toast"></div>
-  </div></div>
+        <div class="timepills">
+          <span class="pill">13:26:48</span>
+          <span class="pill now">13:28:36</span>
+          <span class="pill">13:30:26</span>
+        </div>
+        <div class="track" id="trimTrack"></div>
+
+        <!-- trạng thái IDLE -->
+        <div id="idleBlock">
+          <div class="controls">
+            <div class="cbtn" title="Lùi 5s">⟲</div>
+            <div class="cbtn play"><span>▶</span></div>
+            <div class="cbtn" title="Tới 5s">⟳</div>
+            <div class="cbtn" title="Toàn màn hình">⛶</div>
+          </div>
+          <button class="primary" style="width:100%" id="btnDownload">DOWNLOAD</button>
+          <div class="foot">Xem trong <b>[Thư viện ảnh]</b> sau khi tải video thành công</div>
+        </div>
+
+        <!-- trạng thái DOWNLOADING -->
+        <div id="dlBlock" style="display:none">
+          <div class="controls">
+            <div class="cbtn" title="Lùi 5s">⟲</div>
+            <div class="cbtn play"><span>⏸</span></div>
+            <div class="cbtn" title="Tới 5s">⟳</div>
+            <div class="cbtn" title="Toàn màn hình">⛶</div>
+          </div>
+          <div class="progwrap">
+            <div class="progbar"><i id="progFill" style="--p:38%"></i><span id="progTxt">38% <i class="spin"></i></span></div>
+            <button class="cancel" id="btnCancel">Huỷ tải</button>
+          </div>
+          <div class="foot">Xem trong <b>[Thư viện ảnh]</b> sau khi tải video thành công</div>
+        </div>
+      </div>
+
+      <!-- Popup "Đã tải xong" — hiện NGAY khi tải xong (không còn Alert).
+           Free: nút có 👑 → bấm ra popup nâng cấp. Paid: vào editor. -->
+      <div class="overlay" id="ov-popup">
+        <div class="modal">
+          <div class="ic">🎉</div>
+          <h3>Đã tải xong</h3>
+          <p>Đã lưu vào thư viện.</p>
+          <button class="go" id="btnDraw">✨ Vẽ đường bi</button>
+          <button class="ghost" id="btnClosePopup">Đóng</button>
+        </div>
+      </div>
+
+      <!-- Popup nâng cấp Paid (Free bấm "Vẽ đường bi 👑" / nút bị khoá) -->
+      <div class="overlay" id="ov-upgrade">
+        <div class="modal">
+          <div class="ic">👑</div>
+          <h3>Tính năng gói Paid</h3>
+          <p>Nâng cấp club để mở khoá.</p>
+          <button class="ghost" id="btnCloseUpgrade">Đóng</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ MÀN EDITOR (VideoEditScreen) ══════════ -->
+    <section class="screen" id="s-editor">
+      <div class="statusbar">
+        <span>1:36</span>
+        <span class="icons"><span class="sig"></span><span>📶</span><span class="batt"></span></span>
+      </div>
+      <div class="apphead">
+        <div class="l"><span class="back">‹</span><h2>Chỉnh sửa video</h2></div>
+        <span class="tag new">Paid</span>
+      </div>
+
+      <div class="body">
+        <div class="video">
+          <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
+            <rect x="0" y="120" width="320" height="80" fill="#1a1712"/>
+            <g transform="translate(60 70) rotate(-8)">
+              <rect x="0" y="0" width="200" height="100" rx="12" fill="#aab0b4"/>
+              <circle cx="70" cy="52" r="5" fill="#fafafa"/><circle cx="120" cy="46" r="5" fill="#e6171b"/>
+              <path d="M70 52 Q 96 20 120 46" stroke="#0097fe" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <circle cx="120" cy="46" r="9" fill="none" stroke="#0097fe" stroke-dasharray="3 3"/>
+            </g>
+          </svg>
+          <div class="ts">22-07-2026 Wed 13:26:48</div>
+        </div>
+
+        <div class="capsel" style="margin-top:14px">Kéo để cắt · chạm đường bi để sửa</div>
+        <div class="track" id="editTrack"></div>
+
+        <div class="chips">
+          <div class="lbl">2 đường bi · chạm để sửa</div>
+          <div class="chip">
+            <span class="dot" style="background:#0097fe"></span>
+            <div class="tx"><b>Đường bi 1</b><small>0:04 → 0:12 · xanh dương</small></div>
+            <span class="x">✕</span>
+          </div>
+          <div class="chip">
+            <span class="dot" style="background:#e6171b"></span>
+            <div class="tx"><b>Đường bi 2</b><small>0:15 → 0:20 · đỏ</small></div>
+            <span class="x">✕</span>
+          </div>
+        </div>
+
+        <button class="addmore" id="btnAddMore">＋ Thêm đường bi</button>
+
+        <div class="rowbtns">
+          <button class="b close">Đóng</button>
+          <button class="b done">Xuất video</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ MÀN CANVAS VẼ (AnnotationEditor) ══════════ -->
+    <section class="screen" id="s-draw">
+      <div class="statusbar">
+        <span>1:38</span>
+        <span class="icons"><span class="sig"></span><span>📶</span><span class="batt"></span></span>
+      </div>
+      <div class="apphead">
+        <div class="l"><h2 style="margin-left:6px">Vẽ đường bi</h2></div>
+        <span class="tag new">＃12</span>
+      </div>
+
+      <div class="body">
+        <div class="video">
+          <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
+            <rect x="0" y="120" width="320" height="80" fill="#1a1712"/>
+            <g transform="translate(60 70) rotate(-8)">
+              <rect x="0" y="0" width="200" height="100" rx="12" fill="#aab0b4"/>
+              <circle cx="60" cy="60" r="6" fill="#fafafa"/>
+              <circle cx="150" cy="34" r="6" fill="#ffc700"/>
+              <path d="M60 60 Q 100 84 130 54 T 150 34" stroke="#00cd50" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+              <circle cx="150" cy="34" r="10" fill="none" stroke="#00cd50" stroke-width="2" stroke-dasharray="3 3"/>
+            </g>
+          </svg>
+          <div class="ts">13:26:48 / 13:41</div>
+        </div>
+
+        <div class="playpill">▶ Phát</div>
+
+        <div class="tools">
+          <div class="tool" data-on="1"><div class="g">⤳</div><div class="n">Đường bi</div></div>
+          <div class="tool"><div class="g">↗</div><div class="n">Mũi tên</div></div>
+          <div class="tool"><div class="g">✎</div><div class="n">Vẽ tay</div></div>
+          <div class="tool"><div class="g">◎</div><div class="n">Ghost-ball</div></div>
+        </div>
+
+        <div class="colors" id="colors">
+          <span class="sw" style="background:#ffffff;color:#ffffff"></span>
+          <span class="sw" style="background:#0097fe;color:#0097fe" data-on="1"></span>
+          <span class="sw" style="background:#e6171b;color:#e6171b"></span>
+          <span class="sw" style="background:#ffc700;color:#ffc700"></span>
+          <span class="sw" style="background:#00cd50;color:#00cd50"></span>
+        </div>
+
+        <div class="capsel" style="margin:6px 0 8px">Kéo mốc vàng để chọn khoảng hiện đường bi</div>
+        <div class="track" id="drawTrack"></div>
+
+        <button class="addmore">＋ Thêm đường bi</button>
+
+        <div class="chips" style="margin-top:4px">
+          <div class="lbl">1 đường · chạm để sửa</div>
+          <div class="chip">
+            <span class="dot" style="background:#00cd50"></span>
+            <div class="tx"><b>Đường bi 1</b><small>0:00 → 0:15 · xanh lá</small></div>
+            <span class="x">✕</span>
+          </div>
+        </div>
+
+        <div class="rowbtns">
+          <button class="b close" id="drawClose">Đóng</button>
+          <button class="b done">Xong</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ MÀN XUẤT & CHIA SẺ (sau khi bấm Xuất video) ══════════ -->
+    <section class="screen" id="s-share">
+      <div class="statusbar">
+        <span>1:42</span>
+        <span class="icons"><span class="sig"></span><span>📶</span><span class="batt"></span></span>
+      </div>
+      <div class="apphead">
+        <div class="l"><span class="back">‹</span><h2>Chỉnh sửa video</h2></div>
+        <span class="tag new">Paid</span>
+      </div>
+      <div class="body" style="justify-content:center">
+        <div class="modal" style="animation:none">
+          <h3 style="margin-top:0">Đã lưu video</h3>
+          <div class="vidbadge">🎬</div>
+          <p style="margin:10px 0 0">Đã lưu vào Thư viện · Chia sẻ lên</p>
+          <div class="sharerow">
+            <div class="shareitem"><span class="shareic" style="background:#1877F2">f</span><small>Facebook</small></div>
+            <div class="shareitem"><span class="shareic" style="background:#010101">♪</span><small>TikTok</small></div>
+            <div class="shareitem"><span class="shareic" style="background:#0068FF">Z</span><small>Zalo</small></div>
+          </div>
+          <button class="go arenago" id="btnArena">
+            <span class="amark">A</span> Chia sẻ lên Arena
+          </button>
+          <button class="ghost" id="btnShareClose">Đóng</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="hint">Bấm <b>DOWNLOAD</b> → tải → popup → editor → xuất → chia sẻ · Toggle <b>FREE</b> để xem luồng khoá 👑</div>
 
 <script>
-(function(){
-  var $=function(id){return document.getElementById(id)};
-  var WIN_START=5*3600+45*60, WIN_DUR=15*60; // cửa sổ 05:45 → 06:00 (15')
-  var MAXCUT=10*60, MINCUT=2;                 // tối đa 10', tối thiểu 2s
-  var selStart=5*3600+50*60, selEnd=5*3600+52*60; // mặc định 05:50→05:52 (2')
-  var t=selStart, playing=false, downloading=false, dlTimer=null, stallTimer=null;
-  var paid=(new URLSearchParams(location.search).get('paid')!=='false'); // mặc định Paid
+  const phone = document.getElementById('phone');
+  const switcher = document.getElementById('switcher');
+  const idleBlock = document.getElementById('idleBlock');
+  const dlBlock = document.getElementById('dlBlock');
 
-  // Free/Paid: Free làm mờ preview + đổi ghi chú. Paid mở khoá "Chỉnh sửa" sau tải.
-  function applyPaid(){
-    var pb=$('paidBtn');pb.className='paid'+(paid?'':' free');pb.textContent=paid?'👑 PAID':'FREE';
-    $('stage').className='stage'+(paid?'':' free');
-    $('controls').className='controls'+(paid?'':' locked');
-    $('freeNote').innerHTML=paid?'👑 Paid — chỉnh sửa được sau khi tải':'🔓 Free vẫn tải được — không cần Paid';
-  }
-  function needPaid(){if(!paid){toast('Nâng cấp gói Paid để tua / phóng to');return true;}return false;}
-  $('paidBtn').addEventListener('click',function(){paid=!paid;applyPaid();toast(paid?'Chế độ Paid':'Chế độ Free — xem mờ');});
+  // ── Dựng ruler + window vàng + playhead cho các timeline ──────────────
+  function buildTrack(el, opts) {
+    const { winStart, winEnd, play, labels, markers } = opts;
+    const ruler = document.createElement('div'); ruler.className = 'ruler';
+    for (let p = 0; p <= 100; p += 5) {
+      const i = document.createElement('i');
+      const maj = p % 20 === 0; i.className = maj ? 'maj' : '';
+      i.style.left = p + '%'; i.style.height = maj ? '60%' : '32%';
+      ruler.appendChild(i);
+    }
+    (labels || []).forEach(l => {
+      const b = document.createElement('b'); b.textContent = l.t; b.style.left = l.p + '%'; ruler.appendChild(b);
+    });
+    el.appendChild(ruler);
 
-  function fmt(s){s=Math.round(s);var h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;return (h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;}
-  function durText(d){d=Math.round(d);return 'Đã chọn: '+Math.floor(d/60)+' phút '+(d%60)+' giây';}
+    (markers || []).forEach((m, idx) => {
+      const mk = document.createElement('div'); mk.className = 'marker';
+      mk.style.left = m.s + '%'; mk.style.width = (m.e - m.s) + '%';
+      mk.style.background = m.c; mk.style.bottom = (3 + idx * 7) + 'px';
+      el.appendChild(mk);
+    });
 
-  // Ruler ticks + labels (mỗi phút label, mỗi 30s tick)
-  var ruler=$('ruler');
-  (function(){var w=ruler.clientWidth||358,pps=w/WIN_DUR,html='';
-    for(var s=0;s<=WIN_DUR;s+=30){var x=s*pps,tall=(s%60===0);html+='<div class="rtk" style="left:'+x+'px;height:'+(tall?15:9)+'px"></div>';if(tall){var sec=WIN_START+s;html+='<div class="rlab" style="left:'+(x+3)+'px">'+fmt(sec).slice(0,5)+'</div>';}}
-    ruler.innerHTML=html;
-  })();
-
-  function pps(){return (ruler.clientWidth||358)/WIN_DUR;}
-  function render(){
-    var p=pps();
-    var l=(selStart-WIN_START)*p, r=(selEnd-WIN_START)*p;
-    var sel=$('sel');sel.style.left=l+'px';sel.style.width=(r-l)+'px';
-    $('labL').style.left=l+'px';$('labL').textContent=fmt(selStart);
-    $('labR').style.left=r+'px';$('labR').textContent=fmt(selEnd);
-    var ph=(t-WIN_START)*p;$('playhead').style.left=Math.max(0,Math.min((ruler.clientWidth||358),ph))+'px';
-    $('stamp').textContent='12‑07‑2026 · '+fmt(t);
-    var dur=selEnd-selStart, over=dur>MAXCUT;
-    var cd=$('cutDur');cd.textContent=over?('Đã chọn quá '+(MAXCUT/60)+' phút'):durText(dur);cd.className='cutdur'+(over?' over':'');
-    var b=$('dlBtn');if(!downloading){b.className='dlbtn'+(over||dur<=0?' dis':'');}
+    const win = document.createElement('div'); win.className = 'window';
+    win.style.left = winStart + '%'; win.style.width = (winEnd - winStart) + '%';
+    el.appendChild(win);
+    const hl = document.createElement('div'); hl.className = 'handle l'; hl.textContent = '‹'; hl.style.left = 'calc(' + winStart + '% - 18px)';
+    const hr = document.createElement('div'); hr.className = 'handle r'; hr.textContent = '›'; hr.style.left = winEnd + '%';
+    el.appendChild(hl); el.appendChild(hr);
+    const ph = document.createElement('div'); ph.className = 'playhead'; ph.style.left = play.p + '%'; ph.setAttribute('data-t', play.t);
+    el.appendChild(ph);
   }
 
-  // Kéo 2 tay nắm ◄ ►
-  function drag(handle,which){
-    var dragging=false,startX=0,orig=0;
-    function dn(x){if(downloading)return;dragging=true;startX=x;orig=(which==='l'?selStart:selEnd);playing=false;setPlay(false);}
-    function mv(x){if(!dragging)return;var d=(x-startX)/pps();
-      if(which==='l'){selStart=Math.max(WIN_START,Math.min(selEnd-MINCUT,orig+d));t=selStart;}
-      else{selEnd=Math.min(WIN_START+WIN_DUR,Math.max(selStart+MINCUT,orig+d));}
-      render();}
-    function u(){dragging=false;}
-    handle.addEventListener('mousedown',function(e){e.stopPropagation();e.preventDefault();dn(e.clientX);});
-    window.addEventListener('mousemove',function(e){mv(e.clientX);});
-    window.addEventListener('mouseup',u);
-    handle.addEventListener('touchstart',function(e){e.stopPropagation();dn(e.touches[0].clientX);},{passive:true});
-    window.addEventListener('touchmove',function(e){if(dragging)mv(e.touches[0].clientX);},{passive:true});
-    window.addEventListener('touchend',u);
+  buildTrack(document.getElementById('trimTrack'), {
+    winStart: 18, winEnd: 60, play: { p: 22, t: '13:28:36' },
+    labels: [{ p: 20, t: '13:26' }, { p: 62, t: '13:30' }, { p: 90, t: '13:41' }]
+  });
+  buildTrack(document.getElementById('editTrack'), {
+    winStart: 14, winEnd: 66, play: { p: 30, t: '0:07' },
+    labels: [{ p: 10, t: '0:00' }, { p: 50, t: '0:10' }, { p: 90, t: '0:20' }],
+    markers: [{ s: 18, e: 40, c: '#0097fe' }, { s: 55, e: 68, c: '#e6171b' }]
+  });
+  buildTrack(document.getElementById('drawTrack'), {
+    winStart: 8, winEnd: 34, play: { p: 12, t: '13:30:45' },
+    labels: [{ p: 8, t: '13:31' }, { p: 50, t: '13:36' }, { p: 90, t: '13:41' }],
+    markers: [{ s: 8, e: 34, c: '#00cd50' }]
+  });
+
+  // ── Chuyển màn ────────────────────────────────────────────────────────
+  function go(screen) {
+    phone.setAttribute('data-screen', screen);
+    [...switcher.children].forEach(b => b.setAttribute('aria-current', b.dataset.go === screen ? 'true' : 'false'));
+    // reset khối tải khi về preview idle
+    if (screen === 'preview') { idleBlock.style.display = ''; dlBlock.style.display = 'none'; resetProg(); }
+    if (screen === 'downloading') { idleBlock.style.display = 'none'; dlBlock.style.display = ''; runProgress(); }
   }
-  drag($('hL'),'l');drag($('hR'),'r');
+  switcher.addEventListener('click', e => { const b = e.target.closest('button'); if (b) go(b.dataset.go); });
 
-  function setPlay(p){playing=p;$('pauseBtn').innerHTML=p?'<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>':'<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M8 5v14l11-7z"/></svg>';}
-  $('pauseBtn').addEventListener('click',function(){if(downloading)return;if(needPaid())return;setPlay(!playing);});
-  function seek(d){if(downloading)return;if(needPaid())return;t=Math.max(WIN_START,Math.min(WIN_START+WIN_DUR,t+d));render();toast(d<0?'−5 giây':'+5 giây');}
-  $('rw').addEventListener('click',function(){seek(-5);});
-  $('fw').addEventListener('click',function(){seek(5);});
-  $('fsBtn').addEventListener('click',function(){if(downloading)return;if(needPaid())return;toast('Toàn màn hình (xoay ngang)');});
-  setPlay(false);
-
-  // Luồng tải: kết nối → % → thành công
-  function startDownload(){
-    var dur=selEnd-selStart;if(dur<=0||dur>MAXCUT)return;
-    downloading=true;var b=$('dlBtn');b.className='dlbtn';b.innerHTML='<span>Đang kết nối hệ thống...</span><span class="sp"></span>';
-    $('cancel').classList.add('on');setPlay(false);
-    var p=0,connected=false;
-    clearInterval(dlTimer);clearTimeout(stallTimer);
-    // stall demo: nếu quá 6s chưa xong thì hiện cảnh báo (rút gọn cho demo)
-    stallTimer=setTimeout(function(){if(downloading)$('stall').classList.add('on');},6000);
-    dlTimer=setInterval(function(){
-      if(!connected){connected=true;}
-      p+=Math.random()*9+3;
-      if(p>=100){clearInterval(dlTimer);clearTimeout(stallTimer);b.innerHTML='<span>100%</span><span class="sp"></span>';
-        setTimeout(finishDownload,350);}
-      else{b.innerHTML='<span>'+Math.round(p)+'%</span><span class="sp"></span>';}
-    },260);
+  // ── Progress giả lập ───────────────────────────────────────────────────
+  let progTimer = null;
+  const fill = document.getElementById('progFill');
+  const ptxt = document.getElementById('progTxt');
+  function resetProg() { clearInterval(progTimer); fill.style.setProperty('--p', '38%'); ptxt.innerHTML = '38% <i class="spin"></i>'; }
+  function runProgress() {
+    clearInterval(progTimer); let p = 20;
+    fill.style.setProperty('--p', p + '%'); ptxt.innerHTML = p + '% <i class="spin"></i>';
+    progTimer = setInterval(() => {
+      p += Math.random() * 14 + 4;
+      // Tải xong → vào THẲNG popup "Đã tải xong" (không còn Alert — như app).
+      if (p >= 100) { p = 100; clearInterval(progTimer); fill.style.setProperty('--p', '100%'); ptxt.textContent = 'Hoàn tất'; setTimeout(() => go('done-popup'), 550); return; }
+      fill.style.setProperty('--p', p.toFixed(0) + '%'); ptxt.innerHTML = p.toFixed(0) + '% <i class="spin"></i>';
+    }, 620);
   }
-  function finishDownload(){downloading=false;$('cancel').classList.remove('on');$('stall').classList.remove('on');
-    $('dlBtn').className='dlbtn';$('dlBtn').textContent='DOWNLOAD';render();
-    // Paid → hỏi Chỉnh sửa; Free → chỉ Xem thư viện.
-    $('okMsg').textContent=paid?'Video đã được lưu vào thư viện. Bạn có muốn chỉnh sửa?':'Video đã được lưu vào thư viện.';
-    $('okClose').style.display=paid?'none':'block';
-    $('okEditRow').style.display=paid?'flex':'none';
-    $('okModal').classList.add('on');}
-  function cancelDownload(){clearInterval(dlTimer);clearTimeout(stallTimer);downloading=false;$('cancel').classList.remove('on');$('stall').classList.remove('on');$('dlBtn').className='dlbtn';$('dlBtn').textContent='DOWNLOAD';render();toast('Đã huỷ tải');}
 
-  $('dlBtn').addEventListener('click',function(){if(downloading)return;var dur=selEnd-selStart;if(dur<=0){toast('Chọn thời lượng > 0 giây');return;}if(dur>MAXCUT){toast('Đoạn vượt quá 10 phút');return;}startDownload();});
-  $('cancel').addEventListener('click',cancelDownload);
-  $('okClose').addEventListener('click',function(){$('okModal').classList.remove('on');toast('Mở Thư viện ảnh…');});
-  $('okCloseP').addEventListener('click',function(){$('okModal').classList.remove('on');toast('Đã lưu vào thư viện');});
-  $('okEdit').addEventListener('click',function(){location.href='ball-path-editor-prototype.html';});
+  // ── Wiring luồng thật ──────────────────────────────────────────────────
+  document.getElementById('btnDownload').addEventListener('click', () => go('downloading'));
+  document.getElementById('btnCancel').addEventListener('click', () => go('preview'));
+  // Popup "Đã tải xong": Paid → editor; Free → popup nâng cấp (👑, như app).
+  document.getElementById('btnDraw').addEventListener('click', () => go(isPaid ? 'editor' : 'upgrade'));
+  document.getElementById('btnClosePopup').addEventListener('click', () => go('preview'));
+  document.getElementById('btnCloseUpgrade').addEventListener('click', () => go('preview'));
+  document.getElementById('btnAddMore').addEventListener('click', () => go('draw'));
+  document.getElementById('drawClose').addEventListener('click', () => go('editor'));
+  // Editor "Xuất video" → màn share; Đóng share → về editor.
+  document.querySelector('#s-editor .b.done').addEventListener('click', () => go('share'));
+  document.getElementById('btnShareClose').addEventListener('click', () => go('editor'));
+  // "Chia sẻ lên Arena" — placeholder như app (chưa có action).
+  document.getElementById('btnArena').addEventListener('click', () => {});
 
-  // Back: đang tải → hỏi xác nhận
-  $('back').addEventListener('click',function(){if(downloading)$('backModal').classList.add('on');else toast('Quay lại màn xem lại');});
-  $('backStay').addEventListener('click',function(){$('backModal').classList.remove('on');});
-  $('backGo').addEventListener('click',function(){$('backModal').classList.remove('on');cancelDownload();toast('Đã huỷ & quay lại');});
+  // FREE/PAID toggle → mờ preview khi Free
+  const paid = document.getElementById('paidToggle');
+  const vid = document.getElementById('videoPrev');
+  let isPaid = true;
+  paid.addEventListener('click', () => {
+    isPaid = !isPaid;
+    paid.textContent = isPaid ? '👑 PAID' : 'FREE';
+    paid.style.borderColor = isPaid ? 'var(--gold)' : 'rgba(147,211,255,.3)';
+    paid.style.color = isPaid ? '#f4e3b0' : '#cfe0f2';
+    vid.classList.toggle('blur', !isPaid);
+    // Free: nút trong popup "Đã tải xong" có 👑 (thấy được nhưng khoá — như app)
+    document.getElementById('btnDraw').textContent = isPaid
+      ? '✨ Vẽ đường bi'
+      : '✨ Vẽ đường bi  👑';
+  });
 
-  var toastEl=$('toast'),tTimer;function toast(m){toastEl.textContent=m;toastEl.classList.add('on');clearTimeout(tTimer);tTimer=setTimeout(function(){toastEl.classList.remove('on');},1500);}
-
-  // Playback preview loop (trong đoạn đã chọn)
-  var lastN=performance.now();
-  function tick(now){var dt=(now-lastN)/1000;lastN=now;if(playing&&!downloading){t+=dt;if(t>=selEnd)t=selStart;render();}requestAnimationFrame(tick);}
-  applyPaid();render();requestAnimationFrame(tick);
-})();
+  // chọn công cụ / màu trong canvas vẽ
+  document.querySelectorAll('.tool').forEach(t => t.addEventListener('click', () => {
+    document.querySelectorAll('.tool').forEach(x => x.removeAttribute('data-on')); t.setAttribute('data-on', '1');
+  }));
+  document.querySelectorAll('#colors .sw').forEach(s => s.addEventListener('click', () => {
+    document.querySelectorAll('#colors .sw').forEach(x => x.removeAttribute('data-on')); s.setAttribute('data-on', '1');
+  }));
 </script>
 </body>
 </html>
