@@ -377,7 +377,9 @@
   .anndel { background: rgba(255,91,94,.12); border: 1px solid rgba(255,91,94,.45); color: #ff8a8c; }
   .mbtn { width: 100%; margin-top: 12px; padding: 11px 0; border-radius: 12px; background: rgba(0,151,254,.16); border: 1px solid rgba(0,151,254,.5); color: #8fd0ff; font-family: var(--font); font-size: 13px; font-weight: 800; cursor: pointer; }
   .ehint { color: rgba(255,255,255,.55); font-size: 12px; text-align: center; margin: 10px 0 4px; }
-  .exportbtn { width: 100%; margin: 24px 0 10px; height: 48px; border-radius: 24px; border: none; background: #0097FE; color: #fff; font-family: var(--font); font-size: 15px; font-weight: 800; cursor: pointer; }
+  .exportbtn { width: 100%; margin: 24px 0 12px; height: 54px; border-radius: 27px; border: none; background: linear-gradient(180deg, #1ea6ff, #0097FE); color: #fff; font-family: var(--font); font-size: 17px; font-weight: 800; letter-spacing: .3px; cursor: pointer; box-shadow: 0 12px 28px -10px rgba(0,151,254,.65); transition: transform .18s var(--ease); }
+  .exportbtn:hover { transform: translateY(-2px); }
+  .exportbtn:active { transform: scale(.98); }
 
   /* ── Vẽ fullscreen (content xoay 90° trong khung dọc — như app) ─────── */
   .fstoggle { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; border-radius: 10px; border: 1px solid rgba(255,255,255,.25); background: rgba(0,0,0,.45); color: #fff; font-size: 16px; cursor: pointer; z-index: 5; display: grid; place-items: center; }
