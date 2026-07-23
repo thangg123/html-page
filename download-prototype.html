@@ -382,6 +382,10 @@
   /* ── Vẽ fullscreen (content xoay 90° trong khung dọc — như app) ─────── */
   .fstoggle { position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; border-radius: 10px; border: 1px solid rgba(255,255,255,.25); background: rgba(0,0,0,.45); color: #fff; font-size: 16px; cursor: pointer; z-index: 5; display: grid; place-items: center; }
   .fstoggle:hover { background: rgba(0,151,254,.4); }
+  /* Portrait: hàng Phát + ⛶ sát phải (nút KHÔNG nằm trên video — như app) */
+  .playrow2 { position: relative; display: flex; align-items: center; justify-content: center; }
+  .fstoggle2 { position: absolute; right: 10px; width: 40px; height: 40px; border-radius: 12px; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.08); color: #fff; font-size: 16px; cursor: pointer; display: grid; place-items: center; }
+  .fstoggle2:hover { background: rgba(0,151,254,.4); }
   /* khung xoay: rộng = cao màn (820) · cao = rộng màn (366), rotate 90° */
   .fsrot { position: absolute; width: 820px; height: 366px; top: 227px; left: -227px; transform: rotate(90deg); display: flex; gap: 10px; padding: 12px; background: #000; }
   .fsleft { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
@@ -634,11 +638,13 @@
             </g>
           </svg>
           <div class="ts">13:26:48 / 13:41</div>
-          <!-- ⛶ bật fullscreen landscape (màn to dễ vẽ) — như app -->
-          <button class="fstoggle" id="btnDrawFs" title="Fullscreen">⛶</button>
         </div>
 
-        <div class="playpill">▶ Phát</div>
+        <!-- Hàng dưới video: Phát giữa + ⛶ sát phải (như app — không che video) -->
+        <div class="playrow2">
+          <div class="playpill">▶ Phát</div>
+          <button class="fstoggle2" id="btnDrawFs" title="Fullscreen">⛶</button>
+        </div>
 
         <div class="tools">
           <div class="tool" data-on="1"><div class="g">⤳</div><div class="n">Đường bi</div></div>
