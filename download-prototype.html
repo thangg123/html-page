@@ -651,7 +651,7 @@
         <div class="capsel" style="margin:6px 0 8px">Kéo mốc vàng để chọn khoảng hiện đường bi</div>
         <div class="track" id="drawTrack"></div>
 
-        <button class="addmore">＋ Thêm đường bi</button>
+        <button class="addmore" id="btnDrawAdd">＋ Thêm đường bi</button>
 
         <div class="chips" style="margin-top:4px;display:none" id="drawChips">
           <div class="lbl">1 đường · chạm để sửa</div>
@@ -710,7 +710,7 @@
           </div>
           <div class="fsrow">
             <button class="fspill">▶ Phát</button>
-            <button class="fspill blue">＋ Thêm đường</button>
+            <button class="fspill blue" id="btnFsAdd">＋ Thêm đường</button>
           </div>
           <div class="chip" style="margin-top:10px">
             <span class="dot" style="background:#00cd50"></span>
@@ -963,6 +963,23 @@
   };
   document.getElementById('btnDrawDone').addEventListener('click', addAnn);
   document.getElementById('btnFsDone').addEventListener('click', addAnn);
+
+  // "＋ Thêm đường" TRONG canvas vẽ (như app onAddMore): lưu đường hiện tại +
+  // GIỮ màn vẽ mở để vẽ đường kế (không quay về editor). Nhấp nháy báo đã lưu.
+  function addStay(screen) {
+    if (annCount < ANNS.length) annCount++;
+    renderAnns();
+    const el = document.querySelector(
+      screen === 'draw-fs' ? '#btnFsAdd' : '#btnDrawAdd',
+    );
+    if (el) {
+      const t = el.textContent;
+      el.textContent = '✓ Đã lưu · vẽ đường kế';
+      setTimeout(() => { el.textContent = t; }, 1100);
+    }
+  }
+  document.getElementById('btnDrawAdd').addEventListener('click', () => addStay('draw'));
+  document.getElementById('btnFsAdd').addEventListener('click', () => addStay('draw-fs'));
 
   // FREE/PAID toggle → mờ preview khi Free
   const paid = document.getElementById('paidToggle');
